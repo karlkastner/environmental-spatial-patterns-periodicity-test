@@ -24,6 +24,25 @@ function pattern_periodicity_test_batch()
 	mkdir('./lib/auxiliar/');
 	addpath('./lib/auxiliar');
 
+	% Toolbox check
+	toolbox_C = {
+		'bioinformatics_toolbox',  'Bioinformatics Toolbox'
+		'curve_fitting_toolbox',   'Curve Fitting Toolbox'
+		'image_toolbox',           'Image Processing Toolbox'
+		'map_toolbox',             'Mapping Toolbox'
+		'signal_toolbox',          'Signal Processing Toolbox'
+		'statistics_toolbox',      'Statistics and Machine Learning Toolbox'
+		... % 'symbolic_toolbox',        'Symbolic Math Toolbox'
+	};
+
+	for idx=1:size(toolbox_C,1)
+		if (~license('test',toolbox_C{idx,1})
+			printf('%s is missing, execution will likely fail at a later point.\',toolbox_C{idx,2});
+		end
+	end
+
+
+
 	meta = pattern_periodicity_test_metadata();
 
 	% fetch the script for fetching library files
@@ -33,7 +52,7 @@ function pattern_periodicity_test_batch()
 
 	% fetch library files
 	% dependencies_determine('dependencies.csv','mat/profiling-information.mat',{'pattern_periodicity_test_batch','pdfprint'});
-	dependencies_fetch(meta.url,'dependencies.csv');
+	dependencies_fetch(meta.url.repository,'dependencies.csv');
 
 	% add libraries to path
 	addpath_recursive('./lib');
@@ -43,7 +62,7 @@ function pattern_periodicity_test_batch()
 	meta.pflag = pflag;
 
 	% minimum working example, note that dependencies have to be fetched first
-	periodicity_test_minimum_example();
+	pattern_periodicity_test_minimum_example();
 
 	% Figure 1: manmade vs natural patterns
 	pattern_manmade_vs_natural_plot(pflag);

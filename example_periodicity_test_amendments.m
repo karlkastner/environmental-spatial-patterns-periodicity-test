@@ -47,6 +47,7 @@ function example_periodicity_test_amendments(pflag)
 	pn = 1 - (1-p1)/nt;
 	%pn = 1 - p1/(n);
 	qn = 0.5*Sw*chi2inv(pn,2);
+	nf = 5;
 
 	% reset random number generator for reproducing everytime the same result
 	rng(0);
@@ -99,10 +100,10 @@ function example_periodicity_test_amendments(pflag)
 	disp([median(PP(:,1)),mean(PP(:,2)>0),median(PP(:,3))]);
 
 	% density of a stochastic process with log-normal density
-	[a,b] = logn_mode2par(40,1/40);
+	[a,b] = logn_mode2par(35,1/35);
 	Ss    = lognpdf(abs(fx),a,b);
 	% density of a deterministic process with 1 frequency component
-	Sp    = (abs(fx) == 20) + eps;
+	Sp    = (abs(fx) == 20) + eps*Sw;
 	% normalization
 	Sp = 2*Sp/(sum(Sp)*df);
 	Ss = 2*Ss/(sum(Ss)*df);
@@ -110,6 +111,7 @@ function example_periodicity_test_amendments(pflag)
 	p  = 0.025;
 	S  = (1-p)*Ss+p*Sp;
 	S  = 2*S/(sum(S)*df);
+	Sbar = meanfilt1(Ss,nf);
 
 	splitfigure([2,2],[1,2],fflag);
 	[hn,h] = hist(PP(:,1)*100,0.5:1:10.5);
@@ -130,14 +132,20 @@ function example_periodicity_test_amendments(pflag)
 	legend('Theoretical \chi^2','simulated','location','southeast');
 	xlabel('\hat S');
 	ylabel('p');
-	
+
+
+%clf
+%plot([S,Sp,Ss])
+%[sum(S),sum(Sp),sum(Ss)]
+%pause
 	
 	splitfigure([2,2],[2,1],fflag);
 	plot(fx(fdx),[S(fdx), Sp(fdx),Ss(fdx)]/Sw,'linewidth',1);
+	hline(1,'linewidth',1,'linestyle','--','color','k');
 	set(gca,'colororder',[0,0,0; 0.8,0,0; 0,0,0.8])
 	xlabel('Wavenumber k');
 	ylabel('Density $S / S_{\textrm{w}}$','interpreter','latex');
-	legend('Combined','Periodic','Stochastic')
+	legend('Combined','Periodic','Stochastic','White')
 	set(gca,'yscale','log')
 	ylim([0.001,1]/Sw)
 	xlim([0,nx/2])
@@ -168,12 +176,12 @@ function example_periodicity_test_amendments(pflag)
 	xlabel('Wavenumber k');
 	axis square
 	xlim([0,100]);
+	ylim([0,15]);
 	%legend('$\hat S$ periodogram','$S$ density','interpreter','latex');
 	%,'Median','95%-single','95%-all','interpreter','latex');
 	
 	splitfigure([2,2],[2,3],fflag)
 	cla
-	Sbar = meanfilt1(Ss,5);
 	plot(fx(fdx),Shat(fdx)./Sbar(fdx),'.')
 	hold on
 	%plot(fx(fdx),Shat(fdx)./Ss(fdx),'o')
@@ -192,7 +200,8 @@ function example_periodicity_test_amendments(pflag)
 	axis square
 	xlim([0,100]);
 	pdx = Sw>0&fdx>0;
-	ylim([0,1.1*max(Shat(pdx)./Sbar(pdx))])
+	%ylim([0,1.1*max(Shat(pdx)./Sbar(pdx))])
+	ylim([0,15]);
 	
 	splitfigure([2,2],[2,4],fflag)
 	cla();

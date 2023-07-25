@@ -31,7 +31,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 
 	% significance level for accepting patterns to have periodic frequency components
 	significance_level_a1 = meta.significance_level_a1;
-	significance_level_a1 = 0.01;
+	% significance_level_a1 = 0.01;
 	% minimum number of patterns in a region for being displayed
 	n_min = 50;
 	% confindence levels for error bars in P	
@@ -45,7 +45,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 		% load analysis result
 		type = type_C{tdx};
 		clear spa
-		iname = sprintf([meta.filename.patterns_analyzed,'-stat.mat'],type);
+		iname = sprintf(['mat',filesep,basename(meta.filename.patterns_analyzed),'-stat.mat'],type);
 		load(iname,'spa');
 		% prefetch
 		stat.area_msk   = spa.area_msk;
@@ -57,15 +57,15 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 		% number of regions
 		nr = length(spa.region_C);
 		if (1==tdx)
-			area_m2   = zeros(nt,nr);
-			p_med     = zeros(nt,nr);
-			L_eff     = zeros(nt,nr);
-			w_p_per   = zeros(nt,nr);
-			N_per     = zeros(nt,nr);
-			N         = zeros(nt,nr);
-			N_qc      = zeros(nt,nr);
-			ci        = zeros(nt,nr);
-			intS_hp_sig = zeros(nt,nr);
+			area_m2   = zeros(nt,nr+1);
+			p_med     = zeros(nt,nr+1);
+			L_eff     = zeros(nt,nr+1);
+			w_p_per   = zeros(nt,nr+1);
+			N_per     = zeros(nt,nr+1);
+			N         = zeros(nt,nr+1);
+			N_qc      = zeros(nt,nr+1);
+			ci        = zeros(nt,nr+1);
+			intS_hp_sig = zeros(nt,nr+1);
 		end
 
 		% numbner of patterns
@@ -161,7 +161,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 	
 		splitfigure([2,2],[1,2+2*(tdx-1)],fflag);
 		cla();
-		errorbar(1:length(sdx),P_periodic(tdx,sdx),ci(tdx,sdx,1),ci(tdx,sdx,2),'*');
+		errorbar(1:length(sdx),P_periodic(tdx,sdx),ci(tdx,sdx,1),ci(tdx,sdx,2),'*','linewidth',1);
 		set(gca,'xtick',1:length(sdx),'xticklabel',lab(sdx),'xticklabelrot',45)
 		xlim([0.5,length(sdx)+0.75]);
 		ylim([0,ymax]);

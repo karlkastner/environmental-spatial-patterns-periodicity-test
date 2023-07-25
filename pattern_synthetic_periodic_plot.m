@@ -152,7 +152,6 @@ function pattern_synthetic_periodic_plot(meta)
 	% TODO use Spatial_Pattern/analyse_grid here
         [~, stati] = periodogram_test_periodicity_2d(...
 					b, [L,L],nf_test, bmsk, fmsk, ns);
-	%p = stati.pn;	
 	printf('p-periodic: %g\n',stati.pn);
 
 	R = real(ifft2(S));
@@ -189,7 +188,7 @@ function pattern_synthetic_periodic_plot(meta)
 		reg = Sc_./lc_;
 		
 	end
-	fprintf('iso %d p=%0.2f Sc/lc %0.2f\n',isiso,p_periodic,reg);
+	fprintf('iso %d p=%0.2f Sc/lc %0.2f\n',isiso,stati.pn,reg);
 %		max(ratio(:)) 
 
 	s(isiso+1,idx).x  = x;
@@ -251,7 +250,7 @@ function pattern_synthetic_periodic_plot(meta)
 	colormap(flipud(gray))
 	axis xy
 	if (pflag)
-		colormap(colormap_vegetation)
+		colormap(flipud(colormap_vegetation))
 	end
 	
 	% pattern along x and y
@@ -317,7 +316,8 @@ function pattern_synthetic_periodic_plot(meta)
 	end
 	axis square
 	
-	colormap(flipud(gray))
+	%colormap(flipud(gray))
+	colormap(flipud(colormap_vegetation))
 	xlabel('Wavenumber $k_x/k_c$','interpreter','latex');
 	ylabel('Wavenumber $k_x/k_c$','interpreter','latex');
 	

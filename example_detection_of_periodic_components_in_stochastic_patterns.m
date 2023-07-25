@@ -94,7 +94,7 @@ function example_detection_of_periodic_components_in_stochastic_patterns(pflag)
 	printf('p-value of the stochastic pattern: %0.2g\n',stat.pn);
 	printf('Spectral energy contained in significant components %0.2g%%\n',stat.intShat_sig*100);
 	[~,stat] = periodogram_test_periodicity_2d(bp, [L,L],nf, [], fmsk);
-	printf('p-value of the periodic pattern:   %g\n',p);
+	printf('p-value of the periodic pattern:   %g\n',stat.pn);
 	printf('Spectral energy contained in significant components %0.2g%%\n',stat.intShat_sig*100);
 	[~,stat] = periodogram_test_periodicity_2d(bc, [L,L],nf, [], fmsk);
 	printf('p-value of the cobined pattern:    %g\n',stat.pn);

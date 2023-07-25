@@ -48,7 +48,7 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 
 
 	% save result to mat file
-	save([obase,'.mat'],'-v7.3','spa');
+	save(['mat',filesep,basename([obase,'.mat'])],'-v7.3','spa');
 
 	% save stat only
 	for idx=1:length(spa.sp_a)
@@ -56,7 +56,7 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	end
 
 	% save result to mat file
-	save([obase,'-stat.mat'],'-v7.3','spa');
+	save('mat',filesep,[basename(obase),'-stat.mat'],'-v7.3','spa');
 
 	if (nargout() > 0)
 		sp_a(idx) = spa

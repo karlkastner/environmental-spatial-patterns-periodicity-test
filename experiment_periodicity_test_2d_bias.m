@@ -109,8 +109,10 @@ for ldx=1:length(LL)
  [fx,fy,fr] = fourier_axis_2d([L,L],[L,L]/dx);
  df   = fx(2)-fx(1); % = 1/L
  nf   = round(0.5*sqrt(fc/df));
- a = bandpass1d_continuous_pdf_max2par(fc,1/fc);
- S = bandpass1d_continuous_pdf(fr,fc,a,1);
+[a,b] = gamma_mode2par(fc,1/fc);
+S = gampdf(fr,a,b);
+% a = bandpass1d_continuous_pdf_max2par(fc,1/fc);
+% S = bandpass1d_continuous_pdf(fr,fc,a,1);
  [Sbar,nf2] = circfilt2(S,nf);
  [Sr,fr] = periodogram_radial(S,[L,L]);
  Sbarr = periodogram_radial(Sbar,[L,L]);
@@ -131,7 +133,7 @@ end
  d=0.25;
  xlim([min(reg)-d,max(reg)+d]);
  xlabel('Regularity S_c/\lambda_c');
- hline(p_thresh,'color','k','linestyle','--','linewidth',1);
+ hline(significance_level,'color','k','linestyle','--','linewidth',1);
  ylim([0,0.25]);
  set(gca,'xtick',roundn(reg,2));
  ylabel('P$(p\le0.05)$','interpreter','latex');
