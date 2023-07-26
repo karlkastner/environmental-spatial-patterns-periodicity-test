@@ -17,7 +17,12 @@
 %% metadata
 %
 function meta = pattern_periodicity_test_metadata()
+	% set pflag to 1 to save figures as files
 	meta.pflag = 0;
+
+	% for quick testing, set skip to a large integer to process only
+	% every skip-patern in the database
+	meta.skip = 1;
 
 	% confidence level for significant frequency components 
 	meta.significance_level_a1 = 0.05;
@@ -30,5 +35,16 @@ function meta = pattern_periodicity_test_metadata()
 	meta.filename.dependencies      = 'dependencies.csv';
 	meta.filename.profile           = 'mat/profiling-information.mat';
 	meta.filename.region_shp        = 'input/regions-selected.shp';
+
+	% required matlab toolboxes
+	meta.toolbox_C = {
+		'bioinformatics_toolbox',  'Bioinformatics Toolbox'
+		'curve_fitting_toolbox',   'Curve Fitting Toolbox'
+		'image_toolbox',           'Image Processing Toolbox'
+		'map_toolbox',             'Mapping Toolbox'
+		'signal_toolbox',          'Signal Processing Toolbox'
+		'statistics_toolbox',      'Statistics and Machine Learning Toolbox'
+		... % 'symbolic_toolbox',        'Symbolic Math Toolbox'
+	};
 end
 

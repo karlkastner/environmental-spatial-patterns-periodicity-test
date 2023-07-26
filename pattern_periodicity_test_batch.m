@@ -21,29 +21,18 @@ function pattern_periodicity_test_batch()
 	mkdir('./lib/');
 	mkdir('./mat/');
 	mkdir('./img/');
+	mkdir('./output/');
 	mkdir('./lib/auxiliar/');
 	addpath('./lib/auxiliar');
 
-	% Toolbox check
-	toolbox_C = {
-		'bioinformatics_toolbox',  'Bioinformatics Toolbox'
-		'curve_fitting_toolbox',   'Curve Fitting Toolbox'
-		'image_toolbox',           'Image Processing Toolbox'
-		'map_toolbox',             'Mapping Toolbox'
-		'signal_toolbox',          'Signal Processing Toolbox'
-		'statistics_toolbox',      'Statistics and Machine Learning Toolbox'
-		... % 'symbolic_toolbox',        'Symbolic Math Toolbox'
-	};
+	meta = pattern_periodicity_test_metadata();
 
-	for idx=1:size(toolbox_C,1)
-		if (~license('test',toolbox_C{idx,1})
-			printf('%s is missing, execution will likely fail at a later point.\',toolbox_C{idx,2});
+	% check if required matlab toolboxes are installed
+	for idx=1:size(meta.toolbox_C,1)
+		if (~license('test',meta.toolbox_C{idx,1}))
+			printf('%s is missing, execution will likely fail at a later point.\',meta.toolbox_C{idx,2});
 		end
 	end
-
-
-
-	meta = pattern_periodicity_test_metadata();
 
 	% fetch the script for fetching library files
 	url  = 'https://raw.githubusercontent.com/karlkastner/auxiliar/master/dependencies_fetch.m';

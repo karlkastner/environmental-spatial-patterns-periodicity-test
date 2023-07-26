@@ -32,9 +32,7 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 
 	shp      = Shp.read(iname);
 	centroid = Shp.centroid(shp);
-	% for a quick check, choose only a subset of patterns, such as 1:10:l
-	fdx      = 1:length(shp);
-	spa	 = Spatial_Pattern_Array(centroid(fdx,:),[shp(fdx).dx_sample]);
+	spa	 = Spatial_Pattern_Array(centroid,[shp.dx_sample]);
 	spa.type = type;
 
 	% assign paterns to world regions
@@ -48,7 +46,7 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 
 
 	% save result to mat file
-	save(['mat',filesep,basename([obase,'.mat'])],'-v7.3','spa');
+	save(['mat',filesep,basename(obase),'.mat'],'-v7.3','spa');
 
 	% save stat only
 	for idx=1:length(spa.sp_a)
@@ -56,7 +54,7 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	end
 
 	% save result to mat file
-	save('mat',filesep,[basename(obase),'-stat.mat'],'-v7.3','spa');
+	save(['mat',filesep,basename(obase),'-stat.mat'],'-v7.3','spa');
 
 	if (nargout() > 0)
 		sp_a(idx) = spa
