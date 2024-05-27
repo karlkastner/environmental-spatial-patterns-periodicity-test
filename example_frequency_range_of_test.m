@@ -36,29 +36,35 @@ function example_frequency_range_of_test(pflag)
 	% isotropic log-normal-density
 	% combined with a spurious low frequency lobe in shape of an exponential 
 	[a,b] = logn_mode2par(fc,reg/fc);
-	q=0.5;
+	q=0.66;
 	% spectral density
-	S = q*lognpdf(fr,a,b) + (1-q)*exppdf(fr,fc/2);
+	S = lognpdf(fr,a,b);
+	% + (1-q)*exppdf(fr,fc/2);
+	%S = q*lognpdf(fr,a,b) + (1-q)*exppdf(fr,fc/2);
+	S = S*[q,1] + exppdf(fr,fc/2)*[1-q,0];
 	% cumulative spectral distribution
 	C = cumsum(fr.*S)*(fx(2)-fx(1));
 	% normalize
-	C=C/C(end);
+	C=C./C(end,:);
 
 	% lower limit
-	mdx = find( S(2:end-1) < S(1:end-2) & S(2:end-1) < S(3:end),1,'first')+1;
+	mdx = find( S(2:end-1,1) < S(1:end-2,1) & S(2:end-1,1) < S(3:end,1),1,'first')+1;
 	% upper limit
 	udx = find(C>=0.8,1,'first');
 	
 	figure(1);
 	clf();
-	plot(fr/fc,S*fc,'linewidth',1);
+	plot(fr/fc,S(:,1)*fc,'linewidth',1);
+	hold on
+	plot(fr/fc,S(:,2)*fc,'k--','linewidth',1);
+	ylim([0,1.05])
 	vline(fr(udx)/fc,'color','k','linestyle','--');
 	vline(fr(mdx)/fc,'color','k','linestyle','--');
 	xlim([0,2.5]);
 	xlabel('Wavenumber k_r/k_c');
 	ylabel('Radial density S_r \cdot f_c');
 	yyaxis right
-	plot(fr/fc,C,'r','linewidth',1);
+	plot(fr/fc,C(:,1),'r','linewidth',1);
 	ylabel('Cumulative density C_r');
 	set(gca,'ycolor','r') 
 	axis square

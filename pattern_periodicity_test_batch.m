@@ -80,11 +80,24 @@ function pattern_periodicity_test_batch()
 	% Figure 6: example of periodic and stochastic patterns
 	pattern_synthetic_periodic_plot(meta);
 
+	% Figure
+	vegetation_patterns_plot_joint_density_acf()
+
+	% Figure
+	vegetation_patterns_plot_goodness_of_fit()
+
+
 	% Figure SI 1: 
 	example_detection_of_periodic_components_in_stochastic_patterns(pflag);
 
 	% Figure SI 2:
 	experiment_periodicity_test_2d_bias()
 
-end % function
+	% Figure SI
+	experiment_patch_variation.m
+
+	% figure
+	pattern_periodicity_test_minimum_example.m
+
+end % function pattern_periodicity_test_batch
 

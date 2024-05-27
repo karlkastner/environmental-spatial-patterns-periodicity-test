@@ -22,30 +22,39 @@ function pattern_synthetic_periodic_plot(meta)
 	end
 	pflag = meta.pflag;
 	fflag = pflag;
+%	fflag = 1;
 	
 	ppattern = 0.66;
-	islogn   = false;
+	xmodel   = 'logn';
+	aniso_ymodel = 'normal';
 	log_     = false;
+	p_thresh = [0.55, 0.8];
+
+	p = 0.375;
+	cmap = flipud((1-p)*gray()+p*colormap_vegetation(256));
 	
-	% spatial extent
-	L  = 20*[1,23.0940/20];
-	Lp = 10;
-	% characteristic frequency, fc = 1/lambda_c
+	% characteristic frequency
 	fc = 1;
+	% characteristic wavelength
+	lambda_c = 1./fc;
 	% spatial resolution
-	dx = 1./(fc*20);
+	dx = lambda_c/20;
+	% spatial extent
+	L  = 20*lambda_c*[1,23.0940/20];
+	% cropped extent for plot
+	Lp = 10*lambda_c;
+
 	% number of points
-	n  = round(L/dx);
+	n  = round(L./dx)
 
 	% maximum of the spectral density
-	Sc = [1,1,1];
+	Scx = 1.25*[1,1,1];
+	Scy = 2.5*[1,1,1];
+	Scr = 1.75*[1,1,1];
 	%sy = 1.25;
-	ns = 100;
 
-	Src = 2*[1,1,1];
-	Scy = 2.5*Sc;
 	
-	aniso_ymodel = 'exp';
+	%ns = 100;
 	
 	s=struct();
 	% for isotropic, anisotropic
@@ -57,9 +66,9 @@ function pattern_synthetic_periodic_plot(meta)
 		[fx,fy,frr,tt] = fourier_axis_2d(L,n);
 	% for periodic, periodic with noise, stochastic
 	for idx=1:3
-	bflag = true;
-		% reset random number generator for exact reproducibility of figures
-		rng(0);
+	%bflag = true;
+	% reset random number generator for exact reproducibility of figures
+	rng(0);
 
 	switch (idx)
 	case {1}
@@ -68,91 +77,97 @@ function pattern_synthetic_periodic_plot(meta)
 			p = 1;
 			q = 1;
 			scale = true;
-			a0 = 0;
+			angle0 = 0;
 			sbm = [];
 			%sbm = 1;
-			[b,x,y,Lx,Ly] = hexagonal_pattern(fc,n(1),L(1),a0,scale,sbm,p,q);
+%			                generate_isotropic_pattern(fc,n,L,angle0_rad,p,q,scale,st,rotarg,scalearg)
+			[b,x,y,Lx,Ly] = generate_isotropic_pattern(fc,n(1),L(1),angle0,p,q,scale,sbm);
 			x=x-mean(x);
 			y=y-mean(y);
 			L = [Lx,Ly];
 			n = size(b);
 			%[fx,fy,frr] = fourier_axis_2d(L,n);
-			%bflag = false;
 		else
 			% periodic striped pattern
 			b = sin(2*pi*x*fc + 0.*y')';
 		end
 		S = abs(fft2(b)).^2;
 		S(1,1) = 0;
+		%bflag = false;
 	case {2}
 		% add noise to periodic patterns
 		e=randn(n);
 		b = ppattern*b./rms(b(:))+(1-ppattern)*e/rms(e(:));
 		S = S/mean(S(:)) + ones(n);
+		%bflag = false;
 	case {3}
 		% stochastic pattern
 		e  = randn(n);
 		if (~isiso)
 			% striped pattern
-			if (islogn)
-				[a,b] = logn_mode2param(fc,Sc(idx));
-				Sx    = lognpdf(fx,a,b);
-				Sy    = normpdf(fy,0,0.5./fc);
-			else
-				[a,b] = gamma_mode2par(fc,Sc(idx));
-				Sx    = gampdf(fx,a,b);
-				switch (aniso_ymodel)
-				case {'gamma'}
-					[a,b] = gamma_mode2par(1e-3,Scy(idx));
-					Sy    = gampdf(abs(fy),a,b);
-				case {'exp'}
-					c = exppdf_max2par(Scy(idx));
-					Sy = exppdf(abs(fy),c);
-				case {'normal'}
-					[mu,sd]=normpdf_mode2par(0,0.5*Scy(idx));
-					Sy = 2*normpdf(abs(fy),mu,sd);
-				end
+			switch(xmodel)
+			case {'logn'}
+				[ap,bp] = logn_mode2par(fc,Scx(idx));
+				Sx    = lognpdf(fx,ap,bp);
+			case {'gamma'}
+				[ap,bp] = gamma_mode2par(fc,Scx(idx));
+				Sx      = gampdf(fx,ap,bp);
+			end
+			switch (aniso_ymodel)
+			case {'gamma'}
+				[ap,bp] = gamma_mode2par(1e-3,Scy(idx));
+				Sy    = gampdf(abs(fy),ap,bp);
+			case {'exp'}
+				c = exppdf_max2par(Scy(idx));
+				Sy = exppdf(abs(fy),c);
+			case {'normal'}
+				[mu,sd]=normpdf_mode2par(0,0.5*Scy(idx));
+				Sy = 2*normpdf(abs(fy),mu,sd);
+				%Sy = normpdf(fy,0,0.5./fc);
 			end
 			S = cvec(Sx)*rvec(Sy);
 		else
 			% isotropic pattern
-			if (islogn)
-				[a,b] = logn_mode2param(fc,Sc(idx));
-				Sr = lognpdf(frr,a,b);
-			else
-				[a,b] = gamma_mode2par(fc,Src(idx));
-				Sr = gampdf(frr,a,b);
-				c  = mises_max2par(0); %Sc(idx)*4/pi);
+			switch(xmodel)
+			case {'logn'}
+				[ap,bp] = logn_mode2par(fc,Scr(idx));
+				S  = lognpdf(frr,ap,bp);
+			case {'gamma'}
+				[ap,bp] = gamma_mode2par(fc,Scr(idx));
+				Sr = gampdf(frr,ap,bp);
+				c  = mises_max2par(0);
+				if (0)
 				St = misesnpdf(tt,0,c,6);
 				S = Sr.*St;
+				end
 			end
-		end
+		end % else of ~isiso
 		% transfer function
 		T = sqrt(S);
 		% white (uncorrelated noise)
 		bwhite = e;
-		fwhite = ifft2(bwhite);
+		fwhite = fft2(bwhite);
 		% pattern
-		if (bflag)
-		b = real(ifft2(T.*fwhite));
-		end
+		%if (bflag)
+			b = real(ifft2(T.*fwhite));
+		%end
 	%	b = b/rms(b(:));
-%	case {4}
-	end
+	end % switch idx
 	[fx,fy,frr] = fourier_axis_2d(L,n);
-	Shat = abs(fft2(b-mean(b(:)))).^2;
-	df = 1./L;
-	Shat = 2*Shat./(sum(Shat(:))*df(1)*df(2));
+	% has to be recomputed
+	df   = 1./L;
+	Shat = abs(fft2(b-mean(b,'all'))).^2;
+	Shat = 2*Shat./(sum(Shat,'all')*df(1)*df(2));
 
 	f_50 = fc;
-	dfr = df(1);
+	dfr  = df(1);
 	nf_test = round(0.25*f_50/dfr);
 	fmsk = (frr<4*fc);
 	bmsk = [];
 	% TODO use Spatial_Pattern/analyse_grid here
-        [~, stati] = periodogram_test_periodicity_2d(...
-					b, [L,L],nf_test, bmsk, fmsk, ns);
-	printf('p-periodic: %g\n',stati.pn);
+        [isp, pn, stati] = periodogram_test_periodicity_2d(...
+					b, [L,L],nf_test, bmsk, fmsk);
+	printf('p-periodic: %g\n',pn);
 
 	R = real(ifft2(S));
 	R = R/R(1,1);
@@ -221,7 +236,7 @@ function pattern_synthetic_periodic_plot(meta)
 	
 	% autocorrelation
 	splitfigure([3,8],[10+isiso*10,(idx-1)*8+8],fflag);
-	cla
+	cla();
 	if (isiso)
 		plot(xt,Rt);
 		ylabel('R_t');
@@ -234,24 +249,16 @@ function pattern_synthetic_periodic_plot(meta)
 
 	% pattern (thresholded)	
 	splitfigure([3,8],[10+isiso*10,(idx-1)*8+1],fflag);
-	cla
-	if (isiso)
-		p_ = 0.8;
-	else
-		p_ = 0.55;
-	end
-	b_thresh = quantile(b(:),p_);
+	cla();
+	b_thresh = quantile(b(:),p_thresh(isiso+1));
 	imagesc(x*fc,y*fc,b'>b_thresh);
-	axis([0,Lp,0,Lp]*(1+sqrt(eps)))
+	axis([0,Lp*fc,0,Lp*fc]*(1+sqrt(eps)))
 	axis square
 	set(gca,'xtick',0:2:(Lp-1),'ytick',0:2:(Lp-1));
 	xlabel('Distance $x/\lambda_c$','interpreter','latex');
 	ylabel('Distance $y/\lambda_c$','interpreter','latex');
-	colormap(flipud(gray))
+	colormap(cmap);
 	axis xy
-	if (pflag)
-		colormap(flipud(colormap_vegetation))
-	end
 	
 	% pattern along x and y
 	splitfigure([3,8],[10+isiso*10,(idx-1)*8+2],fflag);
@@ -298,9 +305,13 @@ function pattern_synthetic_periodic_plot(meta)
 	else
 		%scale = 1;
 	end
-	imagesc(fftshift(fx)/fc,fftshift(fy)/fc,fftshift(Shat_)');
+	imagesc(fftshift(fx)/fc,fftshift(fy)/fc,fftshift(Shat_)'*fc^2);
 	axis(2.5*[-1,1,-1,1]);
-		
+	c = colorbar();
+	% TODO different scaling for periodic and aperiodic case
+	set(c,'location','east');
+	title(c,'$\hat S/\lambda_c^2$','interpreter','latex');	
+	
 	if (log_)
 	if (idx ~= 3)
 	if (isiso)
@@ -316,21 +327,24 @@ function pattern_synthetic_periodic_plot(meta)
 	end
 	axis square
 	
-	%colormap(flipud(gray))
-	colormap(flipud(colormap_vegetation))
+	colormap(cmap);
 	xlabel('Wavenumber $k_x/k_c$','interpreter','latex');
 	ylabel('Wavenumber $k_x/k_c$','interpreter','latex');
 	
 	% 2d-autocorrelation
 	splitfigure([3,8],[10+isiso*10,(idx-1)*8+5],fflag);
-	cla
-	imagesc(x,y,fftshift(R)')
+	cla();
+	imagesc(x*fc,y*fc,fftshift(R)')
 	xlim([-2.5,2.5]);
 	ylim([-2.5,2.5]);
 	axis square
 	xlabel('Lag Distance x / \lambda_c');
 	ylabel('Lag Distance y / \lambda_c');
-	
+	axis xy
+	colormap(cmap)
+	c = colorbar();
+	set(c,'location','east');
+	title(c,'$\hat R$','interpreter','latex');	
 	% autocorrelation along primary axis
 	splitfigure([3,8],[10+isiso*10,(idx-1)*8+6],fflag);
 	cla
@@ -484,35 +498,38 @@ function pattern_synthetic_periodic_plot(meta)
 	
 	if (pflag)
 		ps = 3.5;
-		
+
+if (0)		
 		pdfprint(2001,'img/pattern-decomposition-Sx.pdf',ps);
 		pdfprint(2002,'img/pattern-decomposition-Sy.pdf',ps);
 		pdfprint(2003,'img/pattern-decomposition-Sr.pdf',ps);
 		pdfprint(2004,'img/pattern-decomposition-St.pdf',ps);
+end
 	
 		
-		pdfprint(101  ,'img/pattern-aniso-2d-periodic.pdf',ps);
-		pdfprint(109,'img/pattern-aniso-2d-periodic-with-noise.pdf',ps);
-		pdfprint(117,'img/pattern-aniso-2d-stochastic.pdf',ps);
-		
-		pdfprint(201,'img/pattern-iso-2d-periodic.pdf',ps);
-		pdfprint(207+2,'img/pattern-iso-2d-periodic-with-noise.pdf',ps);
-		pdfprint(213+4,'img/pattern-iso-2d-stochastic.pdf',ps);
-		
-		pdfprint(104  ,'img/periodogram-aniso-2d-periodic.pdf',ps);
-		pdfprint(110+2,'img/periodogram-aniso-2d-periodic-with-noise.pdf',ps);
-		pdfprint(116+4,'img/periodogram-aniso-2d-stochastic.pdf',ps);
+		pdfprint(101+0*8,'img/pattern-aniso-2d-periodic.pdf',ps);
+		pdfprint(101+1*8,'img/pattern-aniso-2d-periodic-with-noise.pdf',ps);
+		pdfprint(101+2*8,'img/pattern-aniso-2d-stochastic.pdf',ps);		
+	
+		pdfprint(104+0*8,'img/periodogram-aniso-2d-periodic.pdf',ps);
+		pdfprint(104+1*8,'img/periodogram-aniso-2d-periodic-with-noise.pdf',ps);
+		pdfprint(104+2*8,'img/periodogram-aniso-2d-stochastic.pdf',ps);
 
-		%pdfprint(105  ,'img/autocorrelation-aniso-2d-periodic.pdf',ps);
-		%pdfprint(111+2,'img/autocorrelation-aniso-2d-periodic-with-noise.pdf',ps);
-		%pdfprint(117+4,'img/autocorrelation-aniso-2d-stochastic.pdf',ps);
-		
-		pdfprint(204,'img/periodogram-iso-2d-periodic.pdf',ps);
-		pdfprint(210+2,'img/periodogram-iso-2d-periodic-with-noise.pdf',ps);
-		pdfprint(216+4,'img/periodogram-iso-2d-stochastic.pdf',ps);
-		%pdfprint(205,'img/autocorrelation-iso-2d-periodic.pdf',ps);
-		%pdfprint(211+2,'img/autocorrelation-iso-2d-periodic-with-noise.pdf',ps);
-		%pdfprint(217+4,'img/autocorrelation-iso-2d-stochastic.pdf',ps);
+		pdfprint(105+0*8,'img/correlogram-aniso-2d-periodic.pdf',ps);
+		pdfprint(105+1*8,'img/correlogram-aniso-2d-periodic-with-noise.pdf',ps);
+		pdfprint(105+2*8,'img/correlogram-aniso-2d-stochastic.pdf',ps);
+
+		pdfprint(201+0*8,'img/pattern-iso-2d-periodic.pdf',ps);
+		pdfprint(201+1*8,'img/pattern-iso-2d-periodic-with-noise.pdf',ps);
+		pdfprint(201+2*8,'img/pattern-iso-2d-stochastic.pdf',ps);
+	
+		pdfprint(204+0*8,'img/periodogram-iso-2d-periodic.pdf',ps);
+		pdfprint(204+1*8,'img/periodogram-iso-2d-periodic-with-noise.pdf',ps);
+		pdfprint(204+2*8,'img/periodogram-iso-2d-stochastic.pdf',ps);
+
+		pdfprint(205+0*8,'img/correlogram-iso-2d-periodic.pdf',ps);
+		pdfprint(205+1*8,'img/correlogram-iso-2d-periodic-with-noise.pdf',ps);
+		pdfprint(205+2*8,'img/correlogram-iso-2d-stochastic.pdf',ps);
 		
 %		pdfprint(31,'img/density-schematic-aniso.pdf',ps);
 %		pdfprint(32,'img/schematic-density-aniso-y.pdf',ps);

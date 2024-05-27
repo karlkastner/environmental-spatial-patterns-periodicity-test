@@ -1,5 +1,4 @@
 % 2023-06-02 14:43:13.373394646 +0200
-%
 % Karl Kästner, Berlin
 %
 % This program is free software: you can redistribute it and/or modify
@@ -17,19 +16,22 @@
 %
 %% plot natural and manmade patterns
 %
-function sp = pattern_manmade_vs_natural_plot(pflag)
+function sp = pattern_manmade_vs_natural_plot(meta)
 	if (nargin()<1)
-		pflag = 0;
+		meta = pattern_periodicity_test_metadata();
 	end
-	fflag = pflag;
+	pflag  = meta.pflag;
+	fflag  = pflag;
 	folder = 'input';
+	p      = 0.375;
+	cmap   = flipud((1-p)*gray()+p*colormap_vegetation(256));
 	file_C = {
 		 'nature-anisotropic-mexico_-103.147245_27.656891.png'
 		,'nature-isotropic-mexico_-107.158326_31.337108.png'
 		,'plantation-striped-spain_-2.685893_37.565588.png'
 		,'plantation-hexagonal-spain_-5.356567_37.401112.png'
 	};
-	l = [3,3,3,3];
+	l = [4,4,3,3];
 	
 	% analyze patterns
 	tab = table();
@@ -67,10 +69,9 @@ function sp = pattern_manmade_vs_natural_plot(pflag)
 	
 	% plot patterns
 	for idx=1:length(sp)
-
 		% plot pattern		
 		splitfigure([2,2],[1,idx],fflag);
-		cla()
+		cla();
 		%sp(idx).b_square = imread([folder,filesep,file_C{idx}(1:end-4),'-contrast-stretch.png']);
 		sp(idx).plot('b');
 		if (idx~=1)
@@ -80,20 +81,65 @@ function sp = pattern_manmade_vs_natural_plot(pflag)
 		
 		% plot periodogram
 		splitfigure([2,2],[2,idx],fflag);
-		cla
-		sp(idx).plot('S.rot.hp');
-		c = clim();
-		clim(0.5*c);
-		axis([-1,1,-1,1]*l(idx))
+		cla();
+		% the dots are otherwise too tiny on the plot
+		if (3 == idx || 4 == idx)
+				% filtering with nf=3 reduced the peak height to 1/4,
+				% this is compensated here for by  multiplying with 4
+				sp(idx).S.hp = 4*ifftshift(trifilt2(fftshift(sp(idx).S.hp),3));
+				sp(idx).S.rot.hp = 4*ifftshift(trifilt2(fftshift(sp(idx).S.rot.hp),3));
+		end
+		if (idx == 4)
+			c = sp(idx).plot('S.hp');
+		else
+			c = sp(idx).plot('S.rot.hp');
+		end
+		cl = clim();
+		clim(0.5*cl);
+		axis([-1,1,-1,1]*l(idx));
+		%c = colorbar();
+		title(c,'$\hat S/\lambda_c^2$','interpreter','latex');
+		set(c,'location','east');
+		colormap(cmap)
+
+		% plot correlogram
+		splitfigure([2,2],[3,idx],fflag);
+		cla();
+		%sp(idx).b_square = imread([folder,filesep,file_C{idx}(1:end-4),'-contrast-stretch.png']);
+		if (idx == 4)
+			c=sp(idx).plot('R.hp');
+		else
+			c=sp(idx).plot('R.rot.hp');
+		end
+		if (1 == idx)
+			%caxis([-0.2413,0.66]);
+			caxis(0.3*[-1,2]) 
+		end
+		if (idx==2)
+			caxis(0.1*[-1,2])
+			%caxis([-0.0627,0.5]);
+		end
+		if (idx==1 || idx == 2)
+			xlim(1.5*[-1,1]);
+			ylim(1.5*[-1,1]);
+		else
+			xlim(2.5*[-1,1]);
+			ylim(2.5*[-1,1]);
+		end
+		colormap(cmap);
+		%c = colorbar();
+		title(c,'$\hat R$','interpreter','latex');
+		set(c,'location','east');
 
 		if (pflag)
 			ps = 3.5;
 			f = file_C{idx};
 			pdfprint(10+idx,['img',filesep,f(1:end-4),'-pattern.pdf'],ps);
 			pdfprint(20+idx,['img',filesep,f(1:end-4),'-periodogram-2d.pdf'],ps);
+			pdfprint(30+idx,['img',filesep,f(1:end-4),'-correlogram-2d.pdf'],ps);
 		end % if pflag
 	
 		end % for idx
-		disp(tab)
+		disp(tab);
 end % function
 
