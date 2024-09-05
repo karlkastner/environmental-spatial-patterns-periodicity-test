@@ -99,6 +99,8 @@ function pattern_periodicity_test_batch()
 	experiment_periodicity_test_2d_bias();
 
 	% for web-page generation run vegetation-patterns.rmd in R
-
+	
+	% pack source code
+	system('bash pack.sh');
 end % function pattern_periodicity_test_batch
 
