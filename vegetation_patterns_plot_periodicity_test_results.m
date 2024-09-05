@@ -45,13 +45,14 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 		% load analysis result
 		type = type_C{tdx};
 		clear spa
-		iname = sprintf(['mat',filesep,basename(meta.filename.patterns_analyzed),'-stat.mat'],type);
+		iname = sprintf(meta.filename.patterns_analyzed_mat,type);
+		%iname = sprintf(['mat',filesep,basename(meta.filename.patterns_analyzed),'-stat.mat'],type);
 		load(iname,'spa');
 		% prefetch
-		stat.area_msk   = spa.area_msk;
-		stat.p_periodic = spa.p_periodic;
-		stat.region_id  = spa.region_id;
-		stat.intS_hp_sig  = spa.intS_hp_sig;
+		stat.area_msk       = spa.area_msk;
+		stat.p_periodic     = spa.p_periodic;
+		stat.region_id      = spa.region_id;
+		stat.intS_hp_sig    = spa.intS_hp_sig;
 		stat.quality_check  = spa.quality_check;
 
 		% number of regions
@@ -202,7 +203,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 	fprintf('Expected fraction of patterns with p < a1         %3.2f %3.2f %%\n',significance_level_a1*100,significance_level_a1*100);
 	fprintf('Median area per pattern                           %3.2g %3.2g km^2\n', area_m2(:,end)/1e6);
 	%fprintf('Median number of grid cells per pattern       %g %g\n', round(area_m2(:,end)/dx^2));
-	fprintf('Effective pattern length L_eff                    %3.2g %3.2g\n',L_eff(:,end));
+	fprintf('Median effective pattern length L_eff                    %3.2g %3.2g\n',L_eff(:,end));
 	% 	fprintf('Median required fraction of spectral energy for pattern to be accepted as periodic: %f %%\n',100*critical);
 	fprintf('Mean fraction of spectral energy contained in siginificant components %3.2g%% %3.2g%%\n', 100*intS_hp_sig(:,end));
 	

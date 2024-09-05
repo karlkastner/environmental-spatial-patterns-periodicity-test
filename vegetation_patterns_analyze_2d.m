@@ -27,13 +27,19 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	for tdx=1:length(type_C)
 	type = type_C{tdx};
 
-	iname = sprintf([meta.filename.patterns_sampling_interval,'.shp'],type);
-	obase = sprintf(meta.filename.patterns_analyzed,type);
+	ifilename = sprintf([meta.filename.patterns_sampling_interval,'.shp'],type);
+	ofilename_shp = sprintf(meta.filename.patterns_analyzed_shp,type);
+	ofilename_mat = sprintf(meta.filename.patterns_analyzed_mat,type);
+	ofilename_stat_mat = sprintf(meta.filename.patterns_analyzed_mat,[type,'-stat']);
 
-	shp      = Shp.read(iname);
+	% TODO why is the spa here recreated from the shp instead of being
+	%      loaded directly, is this to exclude invalid or skipped patterns?
+	shp      = Shp.read(ifilename);
 	centroid = Shp.centroid(shp);
-	spa	 = Spatial_Pattern_Array(centroid,[shp.dx_sample]);
+	spa	 = Spatial_Pattern_Array(centroid,[],[shp.dx_sample]);
 	spa.type = type;
+	%spa.opt.folder_mat = 'img/%s/analysis_/%g/';
+	%spa.opt.analyze    = false;
 
 	% assign paterns to world regions
 	spa.assign_regions(meta.filename.region_shp);
@@ -42,11 +48,10 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	spa.analyze();
 
 	% export pattern analysis results to shape file
-	spa.export_shp([obase,'.shp']);
-
+	spa.export_shp(ofilename_shp);
 
 	% save result to mat file
-	save(['mat',filesep,basename(obase),'.mat'],'-v7.3','spa');
+	save(ofilename_mat,'-v7.3','spa');
 
 	% save stat only
 	for idx=1:length(spa.sp_a)
@@ -54,7 +59,7 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	end
 
 	% save result to mat file
-	save(['mat',filesep,basename(obase),'-stat.mat'],'-v7.3','spa');
+	save(ofilename_stat_mat,'-v7.3','spa');
 
 	if (nargout() > 0)
 		sp_a(idx) = spa

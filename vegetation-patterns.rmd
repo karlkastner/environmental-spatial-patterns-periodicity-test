@@ -1,0 +1,96 @@
+---
+title: Regular Vegetation Patterns
+author: Karl Kästner et al.
+---
+Red : Anisotropic Patterns
+<br>
+Blue : Isotropic Patterns
+
+<style type="text/css">
+.main-container {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+
+```{r load-packages, echo=F, message=F, warning=F}
+library(plyr)
+library(dplyr)
+library(terra)
+library(sf)
+library(leaflet)
+library(leafpop)
+library(knitr)
+library(DT)
+knitr::opts_chunk$set(cache=T, echo=F, message=F, warning=F)
+```
+
+
+```{r read-data, echo=F, cache=T}
+aniso <- read_sf("mat/vegetation-patterns-anisotropic-analyzed-poly.shp")
+iso   <- read_sf("mat/vegetation-patterns-isotropic-analyzed-poly.shp")
+```
+
+
+```{r concatenate-data, echo=F, fig.width=12, fig.height=12, out.width="100%", out.height="100vh", cache=T}
+data <- bind_rows(aniso, iso)
+
+x = c();
+y = c();
+for (i in seq(1,nrow(data)))
+{
+  p = st_centroid(data[i,])
+  x[i] = p$geometry[[1]][1]
+  y[i] = p$geometry[[1]][2]
+}
+color <- c("red", "blue")[data$isisotropic+1]
+
+data$x = x
+data$y = y
+data$id = NULL
+data$continent = NULL
+data$L_eff_r = NULL
+data$L_eff_x = NULL
+# area_m2 	1.546844e+05 
+data$contrast=NULL
+data$coverage=NULL
+data$filename=NULL
+data$intS_hp_sig=NULL
+data$isisotropic=NULL
+#p_periodic
+data$p_S_hp=NULL
+data$region_id=NULL
+data$region_str = NULL
+data$regulari_r=NULL
+data$regulari_x=NULL
+data$regulari_y=NULL
+data$runtime1=NULL
+#20	date
+#21	waveleng_r
+#22	waveleng_x
+#23	qc_passed
+
+leaflet(data) %>%
+  addProviderTiles("Esri.WorldImagery", options = tileOptions(maxZoom = 17)) %>%
+  addPolygons(label = ~region, fill = "transparent",
+              popup=popupTable(tibble(data) %>% select(-geometry)), color =color, fillOpacity = 0)
+```
+
+region     : World region the pattern was assigned too<br>
+area_m2    : area of the polygon circumscribing the pattern<br>
+p_periodic : p-value of the periodicity test<br>
+date       : date the satellite image was downloaded<br>
+waveleng_r : charateristic wavelength of isotropic patterns (radial density)<br>
+waveleng_x : characteristic wavelength of anisotropic patterns (x-density)<br>
+qc_passed  : Quality check, only patterns with value 1 are included in the analysis
+
+---
+#```{r}
+#datatable(data)
+#```
+---
+

@@ -31,10 +31,13 @@ function meta = pattern_periodicity_test_metadata()
 
 	meta.filename.patterns_shp      = 'input/vegetation-patterns-%s-selected-regions.shp';
 	meta.filename.patterns_sampling_interval = 'mat/vegetation-patterns-%s-sampling-interval';
-	meta.filename.patterns_analyzed = 'output/vegetation-patterns-%s-analyzed';
+	meta.filename.patterns_analyzed_shp = 'output/vegetation-patterns-%s-analyzed';
+	meta.filename.patterns_analyzed_mat = 'mat/vegetation-patterns-%s-analyzed';
+%	meta.filename.patterns_analyzed_individual = 'img/vegetation-patterns-%s-analyzed';
 	meta.filename.dependencies      = 'dependencies.csv';
-	meta.filename.profile           = 'mat/profiling-information.mat';
+	meta.filename.profile           = 'mat/profile-periodicity-test-batch.mat';
 	meta.filename.region_shp        = 'input/regions-selected.shp';
+	meta.field = 'hp'; % con !!!
 
 	% required matlab toolboxes
 	meta.toolbox_C = {

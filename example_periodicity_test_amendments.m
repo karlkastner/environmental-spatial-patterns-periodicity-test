@@ -100,7 +100,7 @@ function example_periodicity_test_amendments(pflag)
 	disp([median(PP(:,1)),mean(PP(:,2)>0),median(PP(:,3))]);
 
 	% density of a stochastic process with log-normal density
-	[a,b] = logn_mode2par(35,1/35);
+	[a,b] = lognpdf_mode2par(35,1/35);
 	Ss    = lognpdf(abs(fx),a,b);
 	% density of a deterministic process with 1 frequency component
 	Sp    = (abs(fx) == 20) + eps*Sw;

@@ -37,6 +37,7 @@ function vegetation_patterns_fetch(meta)
 		% for a quick testing: when skip is set to an integer larger 1,
 		% only every skip-pattern is processed
 		spa.opt.skip = meta.skip;
+
 		% axuiliary file with hash of spectral quantiles
 		spa.fetch(iname,[obase,'.shp']);
 

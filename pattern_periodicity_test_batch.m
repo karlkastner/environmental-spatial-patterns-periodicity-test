@@ -40,10 +40,10 @@ function pattern_periodicity_test_batch()
 	urlwrite(url,dest);
 
 	% fetch library files
-	% dependencies_determine('dependencies.csv','mat/profiling-information.mat',{'pattern_periodicity_test_batch','pdfprint'});
-	dependencies_fetch(meta.url.repository,'dependencies.csv');
+	% dependencies_determine(meta.filename.dependencies,meta.filename.profile,{'pattern_periodicity_test_batch'}) 
+	dependencies_fetch(meta.url.repository,meta.filename.dependencies);
 
-	% add libraries to path
+	% add library subfolders to path
 	addpath_recursive('./lib');
 
 	% set to true to save fitures to files 
@@ -54,7 +54,7 @@ function pattern_periodicity_test_batch()
 	pattern_periodicity_test_minimum_example();
 
 	% Figure 1: manmade vs natural patterns
-	pattern_manmade_vs_natural_plot(pflag);
+	pattern_manmade_vs_natural_plot(meta);
 	
 	% Figure 2, 3: periodicity test 
 	example_periodicity_test_amendments(pflag);
@@ -81,23 +81,24 @@ function pattern_periodicity_test_batch()
 	pattern_synthetic_periodic_plot(meta);
 
 	% Figure
-	vegetation_patterns_plot_joint_density_acf()
+	vegetation_patterns_plot_joint_density_and_acf();
 
 	% Figure
-	vegetation_patterns_plot_goodness_of_fit()
+	vegetation_patterns_plot_goodness_of_fit();
 
-
-	% Figure SI 1: 
-	example_detection_of_periodic_components_in_stochastic_patterns(pflag);
+	% Figure SI 1:
+	experiment_patch_variation();
 
 	% Figure SI 2:
-	experiment_periodicity_test_2d_bias()
+	experiment_acf_bias();
 
-	% Figure SI
-	experiment_patch_variation.m
+	% Figure SI 3: 
+	example_detection_of_periodic_components_in_stochastic_patterns(pflag);
 
-	% figure
-	pattern_periodicity_test_minimum_example.m
+	% Figure SI 4:
+	experiment_periodicity_test_2d_bias();
+
+	% for web-page generation run vegetation-patterns.rmd in R
 
 end % function pattern_periodicity_test_batch
 

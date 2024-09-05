@@ -88,8 +88,8 @@ fmsk = fmsk & frr < f_lp;
 
 % selected a smoothing radius for estimating the density,
 % we choose nf ~ sqrt(2 fc/df)
-[~, stat] = periodogram_test_periodicity_2d(b, [], nf,bmsk,fmsk);
+[~, pn, stat] = periodogram_test_periodicity_2d(b, [], nf,bmsk,fmsk);
 % note that the p-value slightly differs from that computed by analyze_grid,
 % due to the slighlty different automatic choices for nf, f_hp and f_lp
-printf('p-value: %g\n',stat.pn);
+printf('p-value: %g\n', pn);
 

@@ -15,13 +15,14 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
+meta = pattern_periodicity_test_metadata();
 if (~exist('pflag','var'))
 	pflag = 0;
 end
 fflag = pflag;
 ps = 4;
 
-field = 'hp';
+field = meta.field;
 
 q = 0.05;
 L = 5;
@@ -34,7 +35,7 @@ jc = fzero(@(x) besselj(1,2*pi*x),1);
 
 type_C = {'anisotropic','isotropic'};
 f_C = {'gamma','logn','normpdf_wrapped','periodic'};
-f_legend_C = {'gamma','lognormal','normal','periodic'};
+f_legend_C = {'Gamma','Log-Normal','Normal','Periodic'};
 %f_legend_C = {'gamma','lognormal','wrapped normal','periodic'};
 
 if (~exist('loaded','var') || ~loaded)
@@ -47,10 +48,12 @@ r2_C = {};
 Ri_C = {};
 Si_C = {}; 
 
-
 for jdx=1:length(type_C)
 
-load(['mat/vegetation-patterns-',type_C{jdx},'-analyzed.mat']);
+filename = sprintf(meta.filename.patterns_analyzed_mat,type_C{jdx});
+%filename = ['mat/vegetation-patterns-',type_C{jdx},'-analyzed.mat'];
+load(filename);
+
 n  = length(spa.sp_a);
 
 Ri_C{jdx} = NaN(length(xi),n);
@@ -69,14 +72,13 @@ lc__a = [];
 w = zeros(length(spa.sp_a),1);
 for idx=1:round(n)
 	%dx = spa.dx_sample(idx);
-	%if (1==jdx)
 	switch (type_C{jdx})
 	case {'anisotropic'}
 	if (0 == spa.sp_a(idx).stat.isisotropic)
 		x   = spa.sp_a(idx).x;
 		x   = x-x(1);
-		R   = spa.sp_a(idx).R.rot.x.hp;
-		fc  = spa.sp_a(idx).stat.fc.x.bar;
+		R   = spa.sp_a(idx).R.rot.x.(field);
+		fc  = spa.sp_a(idx).stat.fc.x.(field);
 		lc  = 1./fc;
 		lc_a(idx,jdx) = lc;
 		fdx = find(x > 0.5*lc & x < 1.5*lc);	
@@ -90,18 +92,20 @@ for idx=1:round(n)
 
 		
 		fdx = fx>=0;
-		C = cumsum([0;cvec(spa.sp_a(idx).S.rot.x.hp(fdx))]);
+		% C = cumsum([0;cvec(spa.sp_a(idx).S.rot.xp.(field)(fdx))]);
+		C = cumsum([0;cvec(spa.sp_a(idx).S.rot.x.(field)(fdx))]);
 		Ci = interp1(inner2outer(fx(fdx))/fc,C,inner2outer(fi),'linear');
 		Ci = Ci/Ci(round(end/2));
 		Si = diff(Ci);
 		Si = Si/(sum(Si)*(fi(2)-fi(1)));
-		%Si = interp1(fx,spa.sp_a(idx).S.rot.x.bar/lc,fi,'linear');
+		%Si = interp1(fx,spa.sp_a(idx).S.rot.x.con/lc,fi,'linear');
 
 		%R_(:,jdx) = R_(:,jdx) + Ri;
 		Ri_C{jdx}(:,idx) = Ri;
 		Si_C{jdx}(:,idx) = Si;
-		Sc_a(idx,jdx) = spa.sp_a(idx).stat.Sc.x.(field)*fc;
-%		Sc(idx,1) = spa.sp_a(idx).stat.Sc.x.hp*fc;
+		%Sc_a(idx,jdx) = spa.sp_a(idx).stat.Sc.x.(field)*fc;
+		Sc_a(idx,jdx) = spa.sp_a(idx).stat.Sc.xp.(field)*fc;
+%		Sc(idx,1) = spa.sp_a(idx).stat.Sc.xp.con*fc;
 		try
 		for kdx=1:length(f_C)
 			r2_C{jdx}(idx,kdx)=spa.sp_a(idx).stat.fit.x.(f_C{kdx}).stat.goodness.r2;
@@ -110,14 +114,13 @@ for idx=1:round(n)
 		end
 		end 
 	end
-	%else % jdx==2, isotropic
 	case {'isotropic'}
 	if (1 == spa.sp_a(idx).stat.isisotropic)
-		fc  = spa.sp_a(idx).stat.fc.radial.bar;
+		fc  = spa.sp_a(idx).stat.fc.radial.(field);
 		lc  = 1./fc;
 		lc_a(idx,2) = lc;
 		r   = spa.sp_a(idx).r;
-		R    = spa.sp_a(idx).R.radial.hp;
+		R    = spa.sp_a(idx).R.radial.(field);
 		Jhat = sqrt(besselj(0,2*pi*r/lc).^2+besselj(1,2*pi*r/lc).^2);
 		R    = R./Jhat;
 		fdx = find(r > (jc-0.5)*lc & r < (jc+0.5)*lc);	
@@ -128,8 +131,8 @@ for idx=1:round(n)
 			lc__a(idx) = lc_;
 			Ri = interp1(r/(lc_/jc),R,xi,'linear');
 			%Ri = interp1(r/(lc),R,xi,'linear');
-			S = spa.sp_a(idx).S.radial.hp;
-			C = cumsum(spa.sp_a(idx).S.radial.hp);
+			S = spa.sp_a(idx).S.radial.(field);
+			C = cumsum(spa.sp_a(idx).S.radial.(field));
 			C = C/C(end);
 			fr = spa.sp_a(idx).f.r;
 			Ci = interp1(fr/fc,C,fi,'linear');
@@ -191,9 +194,6 @@ for jdx=1:length(type_C)
 	xlim([0,3]);
 	axis square
 
-%i(:,jdx));
-	%text(1,Rcq(2,jdx),['  ',num2str(nc(jdx))]);
-
 	splitfigure([2,3],[1,(jdx-1)*3+2],fflag);
 	%if (1 == jdx) cla; end
 	cla();
@@ -205,17 +205,11 @@ for jdx=1:length(type_C)
 	axis square
 	if (1==jdx)
 	xlabel('Wavenumber $k_x/k_c$','interpreter','latex');
-	ylabel('Density $S_x/\lambda_c$','interpreter','latex');
+	ylabel('Density $S_x^+/\lambda_c$','interpreter','latex');
 	else
 	xlabel('Wavenumber $k_r/k_c$','interpreter','latex');
 	ylabel('Density $S_r/\lambda_c$','interpreter','latex');
 	end
-
-%	xlabel('r/\lambda_c');
-%x/\lambda_c');
-
-	%sum(Rc_a>0.5)
-	%sum(Rc_a>0.5)./sum(isfinite(Rc_a))
 
 	r2_q = quantile(r2_C{jdx},[0.05,0.5,0.95])
 	splitfigure([2,3],[1,(jdx-1)*3+3],fflag);

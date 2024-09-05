@@ -1,22 +1,26 @@
-Scripts for reproducing the analysis, figures and tables of the manuscript "Are
-regular environmental spatial patterns periodic?" by Kastner et. al.  submitted
-to Ecological Letters on 10 July 2023. This is the substantially revised and
-extended first part of the unpublished manuscript with working title
+Source code and input data for reproducing the analysis of the manuscript:
+"Unravelling the spatial structure of regular environmental spatial patterns",
+submitted to Catena on 19 Feb 2024 (CATENA25913). Originally submitted with
+working title "Are Environmental Spatial Patterns Periodic" to Catena
+on 26 Sep 2023 (CATENA23872). Evolved from first part of the manuscript
 "Irregularity of self-organized vegetation patterns: Theory and empirical
-evidence" submitted to PNAS on 19 January 2022.
+evidence", submitted to PNAS on 19 Jan 2022 (2022-00974).
 
 Requirement:
 - GNU/Linux (recommended operating system)
 - Python 3
-- Matlab R2022b (older versions probably work, toolbox dependencies listed in
+- Matlab R2023b (older versions probably work, toolbox dependencies listed in
                  in pattern_periodicity_test_metadata.m)
 - dependencies from https://github.com/karlkastner
 
 The script "pattern_periodicity_test_batch" reproduces the whole workflow.
-It first fetches dependencies from GitHub, and subsequently executes scripts 
-for fetching and analyzing the patterns, followed by plotting the results.
+It first fetches dependencies from several GitHub repositories and subsequently
+executes scripts:
+- fetching the satellite images from the google maps tile server,
+- analyzing the images,
+- tabulating and plotting the results.
 
-Processing the whole database (~10000) patterns takes approximately 24-48 h.
+Processing the whole database (~10000) patterns takes several days.
 For quick testing, set the parameter skip in pattern_periodicity_test_metadata.m
 to a large integer such as 10, 100 or 1000. In this case only every skip pattern
 will be processed.

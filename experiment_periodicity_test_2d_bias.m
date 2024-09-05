@@ -59,7 +59,7 @@ if (~exist('p','var'))
 	% reset random number generator
 	rng(0);
 	% spectral density
-	[a,b] = logn_mode2par(fc,reg(idx)/fc);
+	[a,b] = lognpdf_mode2par(fc,reg(idx)/fc);
 
 	S  = lognpdf(fr,a,b);
 	% transfer function
@@ -72,8 +72,8 @@ if (~exist('p','var'))
 		% in frequency space
 		b = real(ifft2(T.*fft2(e)));
 		% test for periodicity
-		[issignificant,stat]= periodogram_test_periodicity_2d(b, [L,L], nf, bmsk, fmsk, ns);
-	        p(jdx,idx,ldx) = stat.pn;
+		[issignificant,pn,stat]= periodogram_test_periodicity_2d(b, [L,L], nf, bmsk, fmsk, ns);
+	        p(jdx,idx,ldx) = pn;
 	end % for jdx
 	% plot a pattern with reg ~ 1.4 and L = 10 for illustration
 	if (abs(reg(idx) - sqrt(2)) < sqrt(eps) && LL(ldx) ==  10*lc)
@@ -109,7 +109,7 @@ for ldx=1:length(LL)
  [fx,fy,fr] = fourier_axis_2d([L,L],[L,L]/dx);
  df   = fx(2)-fx(1); % = 1/L
  nf   = round(0.5*sqrt(fc/df));
-[a,b] = gamma_mode2par(fc,1/fc);
+[a,b] = gampdf_mode2par(fc,1/fc);
 S = gampdf(fr,a,b);
 % a = bandpass1d_continuous_pdf_max2par(fc,1/fc);
 % S = bandpass1d_continuous_pdf(fr,fc,a,1);

@@ -58,11 +58,11 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		tab.p_periodic(idx) = sp(idx).stat.p_periodic;
 		tab.isisotropic(idx) = sp(idx).stat.isisotropic;
 		if (sp(idx).stat.isisotropic)
-			tab.wavelength(idx) =  1./sp(idx).stat.fc.radial.bar;
-			tab.L_rel(idx)      =  sp(idx).L(1).*sp(idx).stat.fc.radial.bar;
+			tab.wavelength(idx) =  1./sp(idx).stat.fc.radial.con;
+			tab.L_rel(idx)      =  sp(idx).L(1).*sp(idx).stat.fc.radial.con;
 		else
-			tab.wavelength(idx) =  1./sp(idx).stat.fc.x.bar;
-			tab.L_rel(idx)      = sp(idx).L(1).*sp(idx).stat.fc.x.bar;
+			tab.wavelength(idx) =  1./sp(idx).stat.fc.x.con;
+			tab.L_rel(idx)      = sp(idx).L(1).*sp(idx).stat.fc.x.con;
 		end
 		tab.intS_hp_sig(idx) = sp(idx).stat.stati.intS_hp_sig;
 	end % for idx
@@ -86,13 +86,13 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		if (3 == idx || 4 == idx)
 				% filtering with nf=3 reduced the peak height to 1/4,
 				% this is compensated here for by  multiplying with 4
-				sp(idx).S.hp = 4*ifftshift(trifilt2(fftshift(sp(idx).S.hp),3));
-				sp(idx).S.rot.hp = 4*ifftshift(trifilt2(fftshift(sp(idx).S.rot.hp),3));
+				sp(idx).S.con = 4*ifftshift(trifilt2(fftshift(sp(idx).S.con),3));
+				sp(idx).S.rot.con = 4*ifftshift(trifilt2(fftshift(sp(idx).S.rot.con),3));
 		end
 		if (idx == 4)
-			c = sp(idx).plot('S.hp');
+			c = sp(idx).plot('S.con');
 		else
-			c = sp(idx).plot('S.rot.hp');
+			c = sp(idx).plot('S.rot.con');
 		end
 		cl = clim();
 		clim(0.5*cl);
@@ -107,9 +107,9 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		cla();
 		%sp(idx).b_square = imread([folder,filesep,file_C{idx}(1:end-4),'-contrast-stretch.png']);
 		if (idx == 4)
-			c=sp(idx).plot('R.hp');
+			c=sp(idx).plot('R.con');
 		else
-			c=sp(idx).plot('R.rot.hp');
+			c=sp(idx).plot('R.rot.con');
 		end
 		if (1 == idx)
 			%caxis([-0.2413,0.66]);

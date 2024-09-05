@@ -35,14 +35,13 @@ function example_frequency_range_of_test(pflag)
 	fr=fx(fx>=0);
 	% isotropic log-normal-density
 	% combined with a spurious low frequency lobe in shape of an exponential 
-	[a,b] = logn_mode2par(fc,reg/fc);
-	q=0.66;
+	[a,b] = lognpdf_mode2par(fc,reg/fc);
 	% spectral density
 	S = lognpdf(fr,a,b);
-	% + (1-q)*exppdf(fr,fc/2);
-	%S = q*lognpdf(fr,a,b) + (1-q)*exppdf(fr,fc/2);
+	% spurious low-frequency component
+	q = 0.66;
 	S = S*[q,1] + exppdf(fr,fc/2)*[1-q,0];
-	% cumulative spectral distribution
+	% cumulative distribution
 	C = cumsum(fr.*S)*(fx(2)-fx(1));
 	% normalize
 	C=C./C(end,:);

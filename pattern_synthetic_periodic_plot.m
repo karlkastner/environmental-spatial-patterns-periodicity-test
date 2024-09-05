@@ -48,9 +48,9 @@ function pattern_synthetic_periodic_plot(meta)
 	n  = round(L./dx)
 
 	% maximum of the spectral density
-	Scx = 1.25*[1,1,1];
-	Scy = 2.5*[1,1,1];
-	Scr = 1.75*[1,1,1];
+	Sxpc = 1.25*[1,1,1];
+	Syc = 2.5*[1,1,1];
+	Src = 1.75*[1,1,1];
 	%sy = 1.25;
 
 	
@@ -107,33 +107,33 @@ function pattern_synthetic_periodic_plot(meta)
 			% striped pattern
 			switch(xmodel)
 			case {'logn'}
-				[ap,bp] = logn_mode2par(fc,Scx(idx));
-				Sx    = lognpdf(fx,ap,bp);
+				[ap,bp] = lognmirroredpdf_mode2par(fc,0.5*Sxpc(idx));
+				Sx      = lognmirroredpdf(fx,ap,bp);
 			case {'gamma'}
-				[ap,bp] = gamma_mode2par(fc,Scx(idx));
-				Sx      = gampdf(fx,ap,bp);
+				[ap,bp] = gammirroredpdf_mode2par(fc,0.5*Sxpc(idx));
+				Sx      = gammirroredpdf(fx,ap,bp);
 			end
 			switch (aniso_ymodel)
 			case {'gamma'}
-				[ap,bp] = gamma_mode2par(1e-3,Scy(idx));
-				Sy    = gampdf(abs(fy),ap,bp);
-			case {'exp'}
-				c = exppdf_max2par(Scy(idx));
-				Sy = exppdf(abs(fy),c);
+				[ap,bp] = gampdf_mode2par(1e-3,Syc(idx));
+				Sy      = gampdf(abs(fy),ap,bp);
+			case {'laplace'}
+				[a,b] = laplaepdf_mode2par(0,Syc(idx));
+				Sy    = laplacepdf(abs(fy),a,b);
 			case {'normal'}
-				[mu,sd]=normpdf_mode2par(0,0.5*Scy(idx));
-				Sy = 2*normpdf(abs(fy),mu,sd);
+				[mu,sd]= normpdf_mode2par(0,Syc(idx));
+				Sy     = normpdf(abs(fy),mu,sd);
 				%Sy = normpdf(fy,0,0.5./fc);
 			end
 			S = cvec(Sx)*rvec(Sy);
 		else
 			% isotropic pattern
-			switch(xmodel)
+			switch(xmodel) % rmodel
 			case {'logn'}
-				[ap,bp] = logn_mode2par(fc,Scr(idx));
+				[ap,bp] = lognpdf_mode2par(fc,Src(idx));
 				S  = lognpdf(frr,ap,bp);
 			case {'gamma'}
-				[ap,bp] = gamma_mode2par(fc,Scr(idx));
+				[ap,bp] = gamma_mode2par(fc,Src(idx));
 				Sr = gampdf(frr,ap,bp);
 				c  = mises_max2par(0);
 				if (0)

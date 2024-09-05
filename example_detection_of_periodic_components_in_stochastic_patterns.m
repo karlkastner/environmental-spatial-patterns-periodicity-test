@@ -49,6 +49,7 @@ function example_detection_of_periodic_components_in_stochastic_patterns(pflag)
 	
 	fx = fourier_axis(L,n);
 	x=fftshift(fourier_axis(fx));
+	n = length(fx);
 	
 	% synthesize a periodic pattern, we rotate the pattern, to make
 	% it visually distinguishable from the stochastic pattern
@@ -61,12 +62,13 @@ function example_detection_of_periodic_components_in_stochastic_patterns(pflag)
 	% generate a stochastic striped pattern with log-normal density
 	% in direction perpendicular to stripes and exponential density
 	% in the direction perpendicular to the stripes
-	[a,b] = logn_mode2par(fc,reg/fc);
-	Sx = lognpdf(abs(fx),a,b);
-	Sy = exppdf(abs(fx),fc/4);
-	S  =(cvec(Sx)*rvec(Sy));
+	[a,b] = lognmirroredpdf_mode2par(fc,0.5*reg/fc);
+	Sx = lognmirroredpdf(abs(fx),a,b);
+	[fy0,sy] = laplacepdf_mode2par(0,reg/fc);
+	Sy = laplacepdf(fx,fy0,sy); % fc/4);
+	S  = (cvec(Sx)*rvec(Sy));
 	% uncorrelared noise
-	 e = randn(length(fx));
+	e = randn(n);
 	% transfer function of pattern
 	T = sqrt(S);
 	% generate the stochastic pattern by convolving the noise with
@@ -90,14 +92,14 @@ function example_detection_of_periodic_components_in_stochastic_patterns(pflag)
 	nf = 4; %round(L/lambda_c);
 	% select all frequency components for testing here
         fmsk=true(n);
-	[~,stat]= periodogram_test_periodicity_2d(bs, [L,L], nf, [], fmsk);
-	printf('p-value of the stochastic pattern: %0.2g\n',stat.pn);
+	[~,pn,stat]= periodogram_test_periodicity_2d(bs, [L,L], nf, [], fmsk);
+	printf('p-value of the stochastic pattern: %0.2g\n',pn);
 	printf('Spectral energy contained in significant components %0.2g%%\n',stat.intShat_sig*100);
-	[~,stat] = periodogram_test_periodicity_2d(bp, [L,L],nf, [], fmsk);
-	printf('p-value of the periodic pattern:   %g\n',stat.pn);
+	[~,pn,stat] = periodogram_test_periodicity_2d(bp, [L,L],nf, [], fmsk);
+	printf('p-value of the periodic pattern:   %g\n',pn);
 	printf('Spectral energy contained in significant components %0.2g%%\n',stat.intShat_sig*100);
-	[~,stat] = periodogram_test_periodicity_2d(bc, [L,L],nf, [], fmsk);
-	printf('p-value of the cobined pattern:    %g\n',stat.pn);
+	[~,pn,stat] = periodogram_test_periodicity_2d(bc, [L,L],nf, [], fmsk);
+	printf('p-value of the cobined pattern:    %g\n',pn);
 	printf('Spectral energy contained in significant components %0.2g%%\n',stat.intShat_sig*100);
 
 	% plot the stochastic pattern	
