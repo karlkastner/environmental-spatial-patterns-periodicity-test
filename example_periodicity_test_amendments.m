@@ -133,12 +133,6 @@ function example_periodicity_test_amendments(pflag)
 	xlabel('\hat S');
 	ylabel('p');
 
-
-%clf
-%plot([S,Sp,Ss])
-%[sum(S),sum(Sp),sum(Ss)]
-%pause
-	
 	splitfigure([2,2],[2,1],fflag);
 	plot(fx(fdx),[S(fdx), Sp(fdx),Ss(fdx)]/Sw,'linewidth',1);
 	hline(1,'linewidth',1,'linestyle','--','color','k');
@@ -159,10 +153,7 @@ function example_periodicity_test_amendments(pflag)
 	cla();
 	plot(fx(fdx),Shat(fdx)/Sw,'.')
 	hold on
-	%plot(fx(fdx),Ss(fdx)/S_,'b-','linewidth',1)
-	%plot(fx(fdx),Sp(fdx)/S_,'r--','linewidth',1)
 	if (1)
-	%hline(1,'color',col,'linewidth',1,'linestyle','-')
 	hline(q1/Sw,'color',col,'linewidth',1,'linestyle','-')
 	hline(qn/Sw,'color',col,'linewidth',1,'linestyle','-')
 	o=0.6;
@@ -177,21 +168,16 @@ function example_periodicity_test_amendments(pflag)
 	axis square
 	xlim([0,100]);
 	ylim([0,15]);
-	%legend('$\hat S$ periodogram','$S$ density','interpreter','latex');
-	%,'Median','95%-single','95%-all','interpreter','latex');
 	
 	splitfigure([2,2],[2,3],fflag)
 	cla
 	plot(fx(fdx),Shat(fdx)./Sbar(fdx),'.')
 	hold on
-	%plot(fx(fdx),Shat(fdx)./Ss(fdx),'o')
 	if (1)
-	%hline(1,'color',col,'linewidth',1,'linestyle','-')
 	hline(q1/Sw,'color',col,'linewidth',1,'linestyle','-')
 	hline(qn/Sw,'color',col,'linewidth',1,'linestyle','-')
 	
 	o=0.45+0.8;
-	%text(79,    1+o,'50%-1');
 	text(78,q1/Sw+o,'95%-1');
 	text(78,qn/Sw+o,'95%-n');
 	end
@@ -200,7 +186,6 @@ function example_periodicity_test_amendments(pflag)
 	axis square
 	xlim([0,100]);
 	pdx = Sw>0&fdx>0;
-	%ylim([0,1.1*max(Shat(pdx)./Sbar(pdx))])
 	ylim([0,15]);
 	
 	splitfigure([2,2],[2,4],fflag)
@@ -216,5 +201,5 @@ function example_periodicity_test_amendments(pflag)
 		pdfprint(22,'img/testing-periodogram-raw.pdf',ps);
 		pdfprint(23,'img/testing-periodogram-rescaled.pdf',ps);
 	end
-end % function
+end % function example_periodicity_test_amendments
 

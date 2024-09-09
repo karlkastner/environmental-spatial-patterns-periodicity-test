@@ -13,9 +13,13 @@ Requirement:
                  in pattern_periodicity_test_metadata.m)
 - dependencies from https://github.com/karlkastner
 
+A snapshot of this repository which already includes the required library files
+is available on: https://zenodo.org/records/13695204
+
 The script "pattern_periodicity_test_batch" reproduces the whole workflow.
 It first fetches dependencies from several GitHub repositories and subsequently
 executes scripts:
+- fetching and installing required library files,
 - fetching the satellite images from the google maps tile server,
 - analyzing the images,
 - tabulating and plotting the results.

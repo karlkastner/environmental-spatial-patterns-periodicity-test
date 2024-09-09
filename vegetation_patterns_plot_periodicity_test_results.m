@@ -19,7 +19,7 @@
 %% plot and tabulate results of the periodicity test of the large global
 %% dataset
 %
-function vegetation_patterns_plot_periodicity_test_results(meta)
+function stat_a = vegetation_patterns_plot_periodicity_test_results(meta)
 	if (nargin()<1)
 		meta = pattern_periodicity_test_metadata();
 	end
@@ -27,7 +27,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 	fflag  = pflag;
 	% printscale
 	ps     = 2;
-	type_C = {'anisotropic','isotropic'};
+	type_C = meta.type_C;
 
 	% significance level for accepting patterns to have periodic frequency components
 	significance_level_a1 = meta.significance_level_a1;
@@ -53,7 +53,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 		stat.p_periodic     = spa.p_periodic;
 		stat.region_id      = spa.region_id;
 		stat.intS_hp_sig    = spa.intS_hp_sig;
-		stat.quality_check  = spa.quality_check;
+		[stat.quality_check, stat.qc_flag]  = spa.quality_check;
 
 		% number of regions
 		nr = length(spa.region_C);
@@ -116,6 +116,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 			intS_hp_sig(tdx,rdx) = mean(stat.intS_hp_sig(fdx & fdx_)); 
 			L_eff(tdx,rdx) = median(L_eff_(fdx)./wavelength(fdx));
 		end % for rdx (each region) 
+		stat_a(tdx) = stat;
 	end % for tdx (pattern type)
 	
 	% fractions of patterns with significant frequency components
@@ -205,7 +206,7 @@ function vegetation_patterns_plot_periodicity_test_results(meta)
 	%fprintf('Median number of grid cells per pattern       %g %g\n', round(area_m2(:,end)/dx^2));
 	fprintf('Median effective pattern length L_eff                    %3.2g %3.2g\n',L_eff(:,end));
 	% 	fprintf('Median required fraction of spectral energy for pattern to be accepted as periodic: %f %%\n',100*critical);
-	fprintf('Mean fraction of spectral energy contained in siginificant components %3.2g%% %3.2g%%\n', 100*intS_hp_sig(:,end));
+	fprintf('Mean fraction of spectral energy contained in significant components %3.2g%% %3.2g%%\n', 100*intS_hp_sig(:,end));
 	
 end % function
 

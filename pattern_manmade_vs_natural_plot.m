@@ -32,7 +32,7 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		,'plantation-hexagonal-spain_-5.356567_37.401112.png'
 	};
 	l = [4,4,3,3];
-	
+
 	% analyze patterns
 	tab = table();
 	sp = repmat(Spatial_Pattern(),length(file_C),1);
@@ -43,8 +43,9 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		sp(idx).imread([folder,filesep,file_C{idx}]);
 		sp(idx).analyze_grid();
 
-		q1 = 0.025;                                                             
-	        q2 = 0.975;                                                             
+		q1 = 0.025;
+	        q2 = 0.975;
+		% read satellite image of pattern
 		b = imread([folder,filesep,file_C{idx}]);
 		b = imnormalize(b,q1,q2);
 		if (idx ~= 3)
@@ -53,7 +54,7 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 	        	sp(idx).b_square = imrotate(b,90);
 		end
 
-		% pattern statistics	
+		% pattern statistics
 		tab.filename{idx} = file_C{idx};
 		tab.p_periodic(idx) = sp(idx).stat.p_periodic;
 		tab.isisotropic(idx) = sp(idx).stat.isisotropic;
@@ -66,10 +67,16 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		end
 		tab.intS_hp_sig(idx) = sp(idx).stat.stati.intS_hp_sig;
 	end % for idx
-	
+
+	% dummy calls to ensure that the dependencies for fitting densities
+	% are parsed
+	sp(1).fit_parametric_densities();
+	sp(1).cast(@single);
+	dirname('');
+
 	% plot patterns
 	for idx=1:length(sp)
-		% plot pattern		
+		% plot pattern
 		splitfigure([2,2],[1,idx],fflag);
 		cla();
 		%sp(idx).b_square = imread([folder,filesep,file_C{idx}(1:end-4),'-contrast-stretch.png']);
@@ -78,7 +85,7 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 			xlim([0,10]);
 			ylim([0,10]);
 		end
-		
+
 		% plot periodogram
 		splitfigure([2,2],[2,idx],fflag);
 		cla();
@@ -113,7 +120,7 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		end
 		if (1 == idx)
 			%caxis([-0.2413,0.66]);
-			caxis(0.3*[-1,2]) 
+			caxis(0.3*[-1,2])
 		end
 		if (idx==2)
 			caxis(0.1*[-1,2])
@@ -138,7 +145,7 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 			pdfprint(20+idx,['img',filesep,f(1:end-4),'-periodogram-2d.pdf'],ps);
 			pdfprint(30+idx,['img',filesep,f(1:end-4),'-correlogram-2d.pdf'],ps);
 		end % if pflag
-	
+
 		end % for idx
 		disp(tab);
 end % function

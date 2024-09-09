@@ -44,7 +44,7 @@ function example_frequency_range_of_test(pflag)
 	% cumulative distribution
 	C = cumsum(fr.*S)*(fx(2)-fx(1));
 	% normalize
-	C=C./C(end,:);
+	C = C./C(end,:);
 
 	% lower limit
 	mdx = find( S(2:end-1,1) < S(1:end-2,1) & S(2:end-1,1) < S(3:end,1),1,'first')+1;

@@ -25,6 +25,7 @@ ps = 4;
 field = meta.field;
 
 q = 0.05;
+% spatial extent
 L = 5;
 xi = linspace(0,L,20*L)';
 df = 1/40;
@@ -33,7 +34,7 @@ Rcq = [];
 Scq = [];
 jc = fzero(@(x) besselj(1,2*pi*x),1);
 
-type_C = {'anisotropic','isotropic'};
+type_C = meta.type_C;
 f_C = {'gamma','logn','normpdf_wrapped','periodic'};
 f_legend_C = {'Gamma','Log-Normal','Normal','Periodic'};
 %f_legend_C = {'gamma','lognormal','wrapped normal','periodic'};

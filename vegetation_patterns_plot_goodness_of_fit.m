@@ -20,7 +20,7 @@ if (~exist('pflag','var'))
 end
 fflag = pflag;
 
-type_C = {'anisotropic','isotropic'};
+type_C = meta.type_C;
 
 if (~exist('r2','var'))
 	r2 = {};

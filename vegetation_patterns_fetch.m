@@ -22,7 +22,7 @@ function vegetation_patterns_fetch(meta)
 		meta = pattern_periodicity_test_metadata();
 	end
 
-	type_C = {'anisotropic','isotropic'};
+	type_C = meta.type_C;
 
 	% determine if higher frequency spectrum of sampled patterns is well resolved
 	% for anisotropic and isotropic patterns

@@ -22,15 +22,19 @@ function pattern_synthetic_periodic_plot(meta)
 	end
 	pflag = meta.pflag;
 	fflag = pflag;
-%	fflag = 1;
-	
-	ppattern = 0.66;
-	xmodel   = 'logn';
-	aniso_ymodel = 'normal';
+
 	log_     = false;
 	p_thresh = [0.55, 0.8];
-
 	p = 0.375;
+	
+	ppattern = 0.66;
+	% density model, anisotropic patterns perpendicular to stripe
+	xmodel = 'normal';
+	% density model, anisotropic patterns parallel to stripe
+	aniso_ymodel = 'normal';
+	% density model, radial density of isotropic patterns
+	rmodel   = 'logn';
+
 	cmap = flipud((1-p)*gray()+p*colormap_vegetation(256));
 	
 	% characteristic frequency
@@ -51,10 +55,6 @@ function pattern_synthetic_periodic_plot(meta)
 	Sxpc = 1.25*[1,1,1];
 	Syc = 2.5*[1,1,1];
 	Src = 1.75*[1,1,1];
-	%sy = 1.25;
-
-	
-	%ns = 100;
 	
 	s=struct();
 	% for isotropic, anisotropic
@@ -106,6 +106,9 @@ function pattern_synthetic_periodic_plot(meta)
 		if (~isiso)
 			% striped pattern
 			switch(xmodel)
+			case {'normal'}
+				[ap,bp] = normalmirroredpdf_mode2par(fc,0.5*Sxpc(idx));
+				Sx      = normalmirroredpdf(fx,ap,bp);
 			case {'logn'}
 				[ap,bp] = lognmirroredpdf_mode2par(fc,0.5*Sxpc(idx));
 				Sx      = lognmirroredpdf(fx,ap,bp);
@@ -128,7 +131,7 @@ function pattern_synthetic_periodic_plot(meta)
 			S = cvec(Sx)*rvec(Sy);
 		else
 			% isotropic pattern
-			switch(xmodel) % rmodel
+			switch(rmodel)
 			case {'logn'}
 				[ap,bp] = lognpdf_mode2par(fc,Src(idx));
 				S  = lognpdf(frr,ap,bp);

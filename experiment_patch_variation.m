@@ -23,17 +23,22 @@ if (~exist('pflag','var'))
 	pflag = 0;
 end
 fflag = pflag;
+% reset random generator
 rng(0);
 for jdx=1:5
 
 n = 1e4;
 m = 1e2;
+% spatial resolution
 dx = 1;
+% characteristic wavelength
 lc = m;
+% characteristic frequency
 fc = 1./lc;
+% spatial extent
+L = n*m;
 
 b = zeros((n+2)*m,1);
-L = n*m;
 M = [];
 xi = 0;
  for idx=1:n-2
@@ -47,7 +52,7 @@ xi = 0;
 		k_ = k_(fdx);
 		b(k+k_) = b(k+k_) + betapdf(k_/(m-1),5,5)/betapdf(0.5,5,5);
 	case {2}
-		% width
+		% vary width
 		m_ = round(m*(0.5+betarnd(5,5)));
 		M(idx) = m_;
 		k = (idx-0.5)*m+round(m_/2);
@@ -56,13 +61,13 @@ xi = 0;
 		k_ = k_(fdx);
 		b(k+k_) = b(k+k_) + betapdf(k_/(m_-1),5,5)/betapdf(0.5,5,5);
 	case {3}
-		% location
+		% vary location
 		k = 1 + (idx-1)*m + round(m*(betarnd(5,5)-0.5));
 		k_ = (0:m-1)';
 		fdx = k+k_>0;
 		k_ = k_(fdx);
 		b(k+k_) = b(k+k_) + betapdf(k_/(m-1),5,5)/betapdf(0.5,5,5);
-	case {4} % noise
+	case {4} % add noise
 		b = b(:);
 		k = (idx-1)*m+1;
 		k_ = (0:m-1)';
@@ -83,28 +88,37 @@ xi = 0;
 end
 
 b = b(m+1:(n+1)*m);
-bar = mean(b)
+% bar = mean(b);
 bar = 1;
 x = (0:n*m-1)';
 
-% bartletts estimate
+% estiamte density with bartlett's method
 if (1)
+% split the pattern into sqrt-n slices
 b_ = reshape(b,[],sqrt(n));
+% spatial coordinate axis for a single slice
 x_ = x(1:sqrt(n)*m);
+% fourier axis for a single slice
+fx_ = fourier_axis(x_);
+% spectral resolution (equal to 1/L_)
+dfx_ = fx_(2)-fx_(1);
+% length of a slice
 L_ = x_(end);
-S = abs(fft(b_-mean(b_))).^2;
-S = mean(S,2);
-fx = fourier_axis(x_);
-df = fx(2)-fx(1);
-S = 2*S/(sum(S)*df);
-R = ifft(S);
+% periodogram of slices
+hatS = abs(fft(b_-mean(b_,1))).^2;
+% density estimated as average of slices
+barS = mean(hatS,2);
+% normalize the debsity
+barS = 2*barS/(sum(barS)*dfx_);
+% autocorrelation function
+R = ifft(barS);
 R = R/R(1);
-[Sc,mdx] = max(S);
-fc = abs(fx(mdx));
+% density maximum
+[Sc,mdx] = max(barS);
+% characteristic frequency
+fc = abs(fx_(mdx));
+% characteristic wavenumber
 lc = 1./fc;
-%	 b_= b;
-%	 b = flat(b);
-%	 b = trifilt1(trifilt1(b,101),101);
 else
 	 S = abs(fft(b-mean(b))).^2;
 	 df = 1./L;
@@ -120,11 +134,9 @@ if (jdx == 5)
 	fc = abs(fx(mdx));
 	lc = 1./fc;
 end
-S = 2*S/(sum(S)*df);
+	S = 2*S/(sum(S)*df);
 end
 
-
-%subplot(4,4,1+4*(jdx-1));
 splitfigure([5,4],[1,1+4*(jdx-1)],fflag,[],100);
 a=area(x(1:12*m)/lc,b(1:12*m).*[0,1]/bar);
 a(2).FaceColor = [0,0.66,0];
@@ -132,18 +144,17 @@ ylim([-0.001,1.4])
 ylabel('Pattern b');
 xlabel('Distance x/\lambda_c');
 xlim([0,8]);
-%subplot(4,4,2+4*(jdx-1));
 axis square
 
 splitfigure([5,4],[1,2+4*(jdx-1)],fflag,[],100);
 if (5 ~= jdx)
-	plot(fx/fc,S/L_,'linewidth',1);
+	plot(fx_/fc,barS/L_,'linewidth',1);
 	ylabel('Density S/L');
 	ylim([0,1.05])
 else
 	yyaxis left
 	%s = 1e4;
-	plot(fx/fc,S/L,'linewidth',1);
+	plot(fx_/fc,barS/L,'linewidth',1);
 	ylabel('Density S/L');
 	yl = [0,2]*1e-4;
 	ylim(yl);
@@ -153,7 +164,7 @@ else
 	set(gca,'ycolor','k')
 	% \cdot 10^{-4}');
 if (0) 
-	plot(fx/fc,S/lc,'linewidth',1);
+	plot(fx_/fc,barS/lc,'linewidth',1);
 	yyaxis right;
 	ylim(yl);
 	%ylim(yl*lc/L*1e-4);
@@ -165,7 +176,6 @@ end
 xlim([0 4.25]);
 xlabel('Wavenumber k/k_c');
 axis square
-%subplot(4,4,3+4*(jdx-1));
 
 splitfigure([5,4],[1,3+4*(jdx-1)],fflag,[],100);
 cla
@@ -185,15 +195,11 @@ for idx=1:5
 end
 Ri = interp1(xc/lc,Rc,xi,'spline');
 plot(xi,Ri,'-r','linewidth',1)
-%subplot(4,4,4+4*(jdx-1));
 
 splitfigure([5,4],[1,4+4*(jdx-1)],fflag,[],100);
 p = patch_size_1d(b>mean(b));
 plot((1:m)/lc,lc*p(1:m)/sum(p))
 axis square
-%plot(p/sum(p))
-%xlim([0 1]);
-%xlabel('
 
 end
 

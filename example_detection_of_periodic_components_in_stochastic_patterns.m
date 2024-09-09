@@ -31,7 +31,7 @@ function example_detection_of_periodic_components_in_stochastic_patterns(pflag)
 	fc = 1/lambda_c;
 	% regularity
 	reg = 1;
-	% domain size
+	% spatial extent, domain size
 	L = 10;
 	% sampling interval
 	dx = lambda_c/100;

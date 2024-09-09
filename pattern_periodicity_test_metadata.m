@@ -37,7 +37,8 @@ function meta = pattern_periodicity_test_metadata()
 	meta.filename.dependencies      = 'dependencies.csv';
 	meta.filename.profile           = 'mat/profile-periodicity-test-batch.mat';
 	meta.filename.region_shp        = 'input/regions-selected.shp';
-	meta.field = 'hp'; % con !!!
+	meta.field = 'con';
+	meta.type_C = {'anisotropic','isotropic'};
 
 	% required matlab toolboxes
 	meta.toolbox_C = {
