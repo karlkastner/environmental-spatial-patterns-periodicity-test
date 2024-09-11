@@ -26,10 +26,10 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 	p      = 0.375;
 	cmap   = flipud((1-p)*gray()+p*colormap_vegetation(256));
 	file_C = {
-		 'nature-anisotropic-mexico_-103.147245_27.656891.png'
-		,'nature-isotropic-mexico_-107.158326_31.337108.png'
-		,'plantation-striped-spain_-2.685893_37.565588.png'
-		,'plantation-hexagonal-spain_-5.356567_37.401112.png'
+		  'nature-anisotropic-mexico_-103.147245_27.656891.png'
+		, 'nature-isotropic-mexico_-107.158326_31.337108.png'
+		, 'plantation-striped-spain_-2.685893_37.565588.png'
+		, 'plantation-hexagonal-spain_-5.356567_37.401112.png'
 	};
 	l = [4,4,3,3];
 
@@ -67,12 +67,6 @@ function sp = pattern_manmade_vs_natural_plot(meta)
 		end
 		tab.intS_hp_sig(idx) = sp(idx).stat.stati.intS_hp_sig;
 	end % for idx
-
-	% dummy calls to ensure that the dependencies for fitting densities
-	% are parsed
-	sp(1).fit_parametric_densities();
-	sp(1).cast(@single);
-	dirname('');
 
 	% plot patterns
 	for idx=1:length(sp)

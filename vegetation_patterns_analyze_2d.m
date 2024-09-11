@@ -27,10 +27,9 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	for tdx=1:length(type_C)
 		type = type_C{tdx};
 	
-		ifilename = sprintf([meta.filename.patterns_sampling_interval,'.shp'],type);
-		ofilename_shp = sprintf(meta.filename.patterns_analyzed_shp,type);
-		ofilename_mat = sprintf(meta.filename.patterns_analyzed_mat,type);
-		ofilename_stat_mat = sprintf(meta.filename.patterns_analyzed_mat,[type,'-stat']);
+		ifilename = sprintf([meta.filename.patterns_sampling_interval,'.shp'],meta.date_str,type);
+		ofilename = sprintf(meta.filename.patterns_analyzed,meta.date_str,type);
+		ofilename_stat_mat = sprintf([meta.filename.patterns_analyzed,'-stat'],meta.date_str,type);
 	
 		% TODO why is the spa here recreated from the shp instead of being
 		%      loaded directly, is this to exclude invalid or skipped patterns?
@@ -44,24 +43,30 @@ function sp_a = vegetation_patterns_analyze_2d(meta)
 	
 		% analyze patterns, including the periodicity test
 		spa.analyze();
-	
-		date_str = datestr(now(),'yyyy-mm-yy-HH-MM');
 		
 		% export pattern analysis results to shape file
-		spa.export_shp(ofilename_shp);
-		spa.export_shp([ofilename_shp(1:end-4),'-',date_str,'.mat'],'-v7.3','spa');
+		spa.export_shp(ofilename);
 	
 		% save result to mat file
-		save(ofilename_mat,'-v7.3','spa');
-		save([ofilename_mat(1:end-4),'-',date_str,'.mat'],'-v7.3','spa');
+		save(ofilename,'-v7.3','spa');
 	
 		% save stat only
 		spa.clear_1d_properties();
 	
 		% save stat to mat file
 		save(ofilename_stat_mat,'-v7.3','spa');
-		save([ofilename_stat_mat(1:end-4),'-',date_str,'.mat'],'-v7.3','spa');
-	
+
+		% link output shapefiles
+		% prj projection file is not recreated and hence not copied 
+		% this cannot be symlinks as otherwise git does not
+		% store the file contents
+		system(['cd output && ' ...
+			'ln -f  ../mat/',meta.date_str,'/vegetation-patterns-*analyzed*.shp' ...
+			'       ../mat/',meta.date_str,'/vegetation-patterns-*analyzed*.shx' ...
+			'       ../mat/',meta.date_str,'/vegetation-patterns-*analyzed*.dbf' ...
+			'       .' ...
+		       ]);
+
 		if (nargout() > 0)
 			sp_a(idx) = spa
 		end

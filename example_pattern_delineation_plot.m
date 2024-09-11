@@ -25,7 +25,7 @@ function example_pattern_delineation_plot(meta)
 	% coordinate of pattern	centrold
 	X0 = [07.79111,+047.92607];
 	% load pattern polygons
-	shp = Shp.read(sprintf(meta.filename.patterns_shp,'anisotropic'));
+	shp = Shp.read(sprintf(meta.filename.pattern_polygons,'anisotropic'));
 	centroid = Shp.centroid(shp);
 	% determine pattern closest to centroid
 	d = hypot(centroid(:,1)-X0(2),centroid(:,2)-X0(1));

@@ -45,8 +45,7 @@ function stat_a = vegetation_patterns_plot_periodicity_test_results(meta)
 		% load analysis result
 		type = type_C{tdx};
 		clear spa
-		iname = sprintf(meta.filename.patterns_analyzed_mat,type);
-		%iname = sprintf(['mat',filesep,basename(meta.filename.patterns_analyzed),'-stat.mat'],type);
+		iname = sprintf(meta.filename.patterns_analyzed,meta.date_str,type);
 		load(iname,'spa');
 		% prefetch
 		stat.area_msk       = spa.area_msk;

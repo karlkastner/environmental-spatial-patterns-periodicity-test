@@ -22,18 +22,20 @@ function vegetation_patterns_fetch(meta)
 		meta = pattern_periodicity_test_metadata();
 	end
 
-	type_C = meta.type_C;
+	type_C   = meta.type_C;
 
 	% determine if higher frequency spectrum of sampled patterns is well resolved
 	% for anisotropic and isotropic patterns
 	for tdx=1:length(type_C)
 		type = type_C{tdx};
 
-		iname = sprintf(meta.filename.patterns_shp,type);
-		obase = sprintf(meta.filename.patterns_sampling_interval,type);
+		iname = sprintf(meta.filename.pattern_polygons,type);
+		obase = sprintf(meta.filename.patterns_sampling_interval,meta.date_str,type);
 
 		spa = Spatial_Pattern_Array();
 		spa.type = type;
+		spa.opt.base_str = sprintf(meta.filename.base,meta.date_str,type);
+
 		% for a quick testing: when skip is set to an integer larger 1,
 		% only every skip-pattern is processed
 		spa.opt.skip = meta.skip;

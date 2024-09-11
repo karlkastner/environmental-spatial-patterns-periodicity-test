@@ -14,7 +14,10 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-meta = pattern_periodicity_test_metadata();
+if (~exist('meta','var'))
+	meta = pattern_periodicity_test_metadata();
+end
+
 if (~exist('pflag','var'))
 	pflag = 0;
 end
@@ -25,21 +28,30 @@ type_C = meta.type_C;
 if (~exist('r2','var'))
 	r2 = {};
 	
-	for tdx=1:2
-		filename = sprintf(meta.filename.patterns_analyzed_mat,type_C{tdx});
-		%filename = ['mat/vegetation-patterns-',type_C{tdx},'-analyzed.mat']);
+	% for each pattern type
+	for tdx=1:length(type_C)
+		filename = sprintf([meta.filename.patterns_analyzed,'-stat'],meta.date_str,type_C{tdx});
+		disp(['Loading ',filename]);
 		load(filename);
 		
 		n=length(spa.sp_a);
-		f_C  = {'gamma','logn','normpdf_wrapped','periodic'};
+		f_C  = {'gamma','logn','normalmirroredpdf','periodic'};
 		f_C_ = {'Gamma','Log-Normal','Normal','Periodic'};
 		nf = length(f_C);
+		% for each pattern
 		for idx=1:n
+			% for each parametric density
 			for jdx=1:nf
 				 try
-					 r2{tdx}(idx,jdx)=spa.sp_a(idx).stat.fit.radial.(f_C{jdx}).stat.goodness.r2;
+					switch (type_C{tdx})
+					case {'anisotropic'}
+						r2{tdx}(idx,jdx)=spa.sp_a(idx).stat.fit.x.(f_C{jdx}).stat.goodness.r2;
+					case {'isotropic'}
+						r2{tdx}(idx,jdx)=spa.sp_a(idx).stat.fit.radial.(f_C{jdx}).stat.goodness.r2;
+					end
 				 catch e
-					disp(jdx);
+					disp(idx);
+					disp(e);
 					disp(e.identifier);
 				 	r2{tdx}(idx,jdx)=NaN;
 				end
@@ -48,7 +60,8 @@ if (~exist('r2','var'))
 	end % for tdx
 end % if ~exist
 
-for tdx=1:2
+% for each pattern type
+for tdx=1:length(type_C)
 	q = quantile(r2{tdx},[0.05,0.5,0.95])
 	splitfigure([2,2],[1,tdx],fflag);
 	cla();

@@ -38,13 +38,12 @@ show = False
 # 0 is script name
 pattern_type = sys.argv[1];
 dx_str = sys.argv[2];
+base_str = sys.argv[3];
 dx     = float(dx_str);
 
 dmin = 2e-5;
 
 dir_str    = './'
-
-pattern_type_C = ["anisotropic", "isotropic"];
 
 # initialize QGIS
 qgs = QgsApplication([], False)
@@ -55,15 +54,19 @@ project = QgsProject.instance()
 
 dy      = dx
 	
-# manually delineated polygons enclosing the patterns
-input_str       = dir_str + '/mat/vegetation-patterns-' + pattern_type + '-sampling-interval.shp'
-shp_reprojected = 'mat/vegetation-patterns-polygons-' + pattern_type + '-reprojected.shp'
-
 # output qgis file
-project_str  = dir_str + '/mat/vegetation-patterns-' + pattern_type + '.qgz'
+#project_str  = dir_str + '/mat/vegetation-patterns-' + pattern_type + '.qgz'
 
-# output directory names for fetched images
+# shape file with manually delineated polygons eclosing the patterns in arbitrary crs
+inputfilname       = base_str + '-sampling-interval.shp'
+# reprojected to google mercartor crs
+reprojfilename = base_str + '-reprojected.shp'
+# qgis file for temporary project
+project_str     = base_str + + '.qgz'
+
+# name of output directory for fetched images
 img_dir  = dir_str + '/img/' + pattern_type + '/' + dx_str + "/"
+
 # output filename base for cropped tiles
 img_base = 'google-satellite_'
 # output file name for sampled transects in matlab format
@@ -90,7 +93,7 @@ google_crs_str = "EPSG:900913"
 shp_crs  = QgsCoordinateReferenceSystem(shp_crs_str)
 google_crs = QgsCoordinateReferenceSystem(google_crs_str)
 	
-cmd = 'ogr2ogr ' + ' -s_srs ' + shp_crs_str + ' -t_srs ' + google_crs_str + ' ' + shp_reprojected + ' ' + input_str
+cmd = 'ogr2ogr ' + ' -s_srs ' + shp_crs_str + ' -t_srs ' + google_crs_str + ' ' + reprojfilename + ' ' + inputfilname
 os.system(cmd);
 
 # add google satellite tile server as source layer
@@ -104,7 +107,7 @@ else:
 # google_layer   = QgsProject.instance().mapLayersByName("google-satellite")[0]
 
 # open the input shapefile
-transect_layer = QgsVectorLayer(input_str, 'borders', 'ogr')
+transect_layer = QgsVectorLayer(inputfilname, 'borders', 'ogr')
 if not transect_layer.isValid():
 	raise Exception('Layer is invalid')
 
@@ -121,7 +124,7 @@ continent_a = [];
 name_a      = [];
 i = 0;
 print('Reading polygon coordinates');
-print(input_str)
+print(inputfilname)
 for feature in feature_a:
 	# todo call by name
 	# continent_a.append(feature.attributes()[2]);
@@ -192,7 +195,7 @@ for i in range(len(bb_a)):
 		cmd= ('gdal_calc.py --overwrite --co COMPRESS=LZW -A ' + mskfile + ' --outfile=' + mskfile + ' --calc=0')
 		os.system(cmd)
 		# burn pattern mask
-		cmd=('gdal_rasterize -burn 1 ' + "-where \"id\"='" + str(i) + "' " + shp_reprojected + ' ' + mskfile)
+		cmd=('gdal_rasterize -burn 1 ' + "-where \"id\"='" + str(i) + "' " + reprojfilename + ' ' + mskfile)
 		os.system(cmd)
 	# end if not exists mskfile
 # end for i

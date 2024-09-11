@@ -15,10 +15,10 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 
-meta = pattern_periodicity_test_metadata();
-if (~exist('pflag','var'))
-	pflag = 0;
+if (~exist('meta','var'))
+	meta = pattern_periodicity_test_metadata();
 end
+pflag = meta.pflag;
 fflag = pflag;
 ps = 4;
 
@@ -35,7 +35,7 @@ Scq = [];
 jc = fzero(@(x) besselj(1,2*pi*x),1);
 
 type_C = meta.type_C;
-f_C = {'gamma','logn','normpdf_wrapped','periodic'};
+f_C = {'gamma','logn','normalmirroredpdf','periodic'};
 f_legend_C = {'Gamma','Log-Normal','Normal','Periodic'};
 %f_legend_C = {'gamma','lognormal','wrapped normal','periodic'};
 
@@ -51,8 +51,9 @@ Si_C = {};
 
 for jdx=1:length(type_C)
 
-filename = sprintf(meta.filename.patterns_analyzed_mat,type_C{jdx});
+filename = sprintf(meta.filename.patterns_analyzed,meta.date_str,type_C{jdx});
 %filename = ['mat/vegetation-patterns-',type_C{jdx},'-analyzed.mat'];
+disp(['Loading analysis of ', type_C{jdx}, ' patterns']);
 load(filename);
 
 n  = length(spa.sp_a);
@@ -71,7 +72,7 @@ r2_C{jdx} = NaN(n,length(f_C));
 lc__a = [];
 % weigths
 w = zeros(length(spa.sp_a),1);
-for idx=1:round(n)
+for idx=1:n
 	%dx = spa.dx_sample(idx);
 	switch (type_C{jdx})
 	case {'anisotropic'}
@@ -111,7 +112,8 @@ for idx=1:round(n)
 		for kdx=1:length(f_C)
 			r2_C{jdx}(idx,kdx)=spa.sp_a(idx).stat.fit.x.(f_C{kdx}).stat.goodness.r2;
 		end % for kdx
-		catch
+		catch e
+			e
 		end
 		end 
 	end
@@ -146,7 +148,8 @@ for idx=1:round(n)
 			for kdx=1:length(f_C)
 				r2_C{jdx}(idx,kdx)=spa.sp_a(idx).stat.fit.radial.(f_C{kdx}).stat.goodness.r2;
 			end % for kdx
-			catch
+			catch e
+				e
 			end
 		end
 	end
@@ -154,7 +157,7 @@ for idx=1:round(n)
 	%end
 end % for idx
 end % for jdx
-end
+end % if loaded
 
 for jdx=1:length(type_C)
 	Rcq(:,jdx) = quantile(Rc_a(:,jdx),[q,0.5,1-q]);

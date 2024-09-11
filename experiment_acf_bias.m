@@ -52,7 +52,9 @@ for idx=1:length(dfc)
 	% truncated
 	a(:,1) = autocorr_unbiased(y);
 	% padding zeros (matlab default)
-	a(:,2) = [cvec(autocorr(y,n-2));NaN];
+	% this yields the same result as the matlab function in the
+	% econometric toolbox
+	a(:,2) = autocorr_zero(y);
 	% periodically extended
 	a(:,3) = autocorr_periodic(y);
 	a = a./a(1,:);

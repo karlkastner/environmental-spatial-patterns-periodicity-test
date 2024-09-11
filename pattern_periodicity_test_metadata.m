@@ -25,19 +25,20 @@ function meta = pattern_periodicity_test_metadata()
 	meta.skip = 1;
 
 	% confidence level for significant frequency components 
-	meta.significance_level_a1 = 0.05;
+	meta.significance_level_a1      = 0.05;
 	
 	meta.url.repository             = 'https://github.com/karlkastner/';
 
-	meta.filename.patterns_shp      = 'input/vegetation-patterns-%s-selected-regions.shp';
-	meta.filename.patterns_sampling_interval = 'mat/vegetation-patterns-%s-sampling-interval';
-	meta.filename.patterns_analyzed_shp = 'output/vegetation-patterns-%s-analyzed';
-	meta.filename.patterns_analyzed_mat = 'mat/vegetation-patterns-%s-analyzed';
-%	meta.filename.patterns_analyzed_individual = 'img/vegetation-patterns-%s-analyzed';
+	meta.filename.base              = 'mat/%s/vegetation-patterns-%s';
+	meta.filename.pattern_polygons = 'input/vegetation-patterns-%s-selected-regions.shp';
+	meta.filename.patterns_sampling_interval = 'mat/%s/vegetation-patterns-%s-sampling-interval';
+	meta.filename.patterns_analyzed = 'mat/%s/vegetation-patterns-%s-analyzed';
 	meta.filename.dependencies      = 'dependencies.csv';
 	meta.filename.profile           = 'mat/profile-periodicity-test-batch.mat';
 	meta.filename.region_shp        = 'input/regions-selected.shp';
+
 	meta.field = 'con';
+	meta.date_str = '';
 	meta.type_C = {'anisotropic','isotropic'};
 
 	% required matlab toolboxes

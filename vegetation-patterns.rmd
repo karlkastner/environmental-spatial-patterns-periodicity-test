@@ -37,18 +37,24 @@ iso   <- read_sf("mat/vegetation-patterns-isotropic-analyzed-poly.shp")
 
 
 ```{r concatenate-data, echo=F, fig.width=12, fig.height=12, out.width="100%", out.height="100vh", cache=T}
-data <- bind_rows(aniso, iso)
+#data <- bind_rows(aniso, iso)
+data <- rbind(aniso, iso)
+data = data[1:10,]
 
 x = c();
 y = c();
+options(warn=-1)
 for (i in seq(1,nrow(data)))
 {
   p = st_centroid(data[i,])
   x[i] = p$geometry[[1]][1]
   y[i] = p$geometry[[1]][2]
 }
+options(warn=0)
+print("assigning colours")
 color <- c("red", "blue")[data$isisotropic+1]
 
+print("assingning data values")
 data$x = x
 data$y = y
 data$id = NULL
@@ -74,10 +80,12 @@ data$runtime1=NULL
 #22	waveleng_x
 #23	qc_passed
 
+print("generating leaflet")
 leaflet(data) %>%
   addProviderTiles("Esri.WorldImagery", options = tileOptions(maxZoom = 17)) %>%
   addPolygons(label = ~region, fill = "transparent",
               popup=popupTable(tibble(data) %>% select(-geometry)), color =color, fillOpacity = 0)
+
 ```
 
 region     : World region the pattern was assigned too<br>

@@ -26,6 +26,8 @@ function pattern_periodicity_test_batch()
 	addpath('./lib/auxiliar');
 
 	meta = pattern_periodicity_test_metadata();
+	meta.date_str = datestr(now(),'yyyy-mm-dd-HH-MM');
+	mkdir(['mat/',meta.date_str]);
 
 	% check if required matlab toolboxes are installed
 	for idx=1:size(meta.toolbox_C,1)
@@ -39,9 +41,15 @@ function pattern_periodicity_test_batch()
 	dest = './lib/auxiliar/dependencies_fetch.m';
 	urlwrite(url,dest);
 
-	% fetch library files
-	% dependencies_determine(meta.filename.dependencies,meta.filename.profile,{'pattern_periodicity_test_batch'}) 
+	% fetch library files, not required for code packed with prefeteched
+	% libraries
 	dependencies_fetch(meta.url.repository,meta.filename.dependencies);
+
+	% determine dependencies (prior to packing)
+	% to make sure all dependencies for the analysus are parsed, delete
+	% the precomputed output for one pattern
+	% rm img/anisotropic/analysis/2/google-satellite_+11.16080_+050.41496.mat	
+	% dependencies_determine(meta.filename.dependencies,meta.filename.profile,{'pattern_periodicity_test_batch'}) 
 
 	% add library subfolders to path
 	addpath_recursive('./lib');
@@ -69,7 +77,7 @@ function pattern_periodicity_test_batch()
 	example_periodicity_test_renshaw_ford();
 
 	% fetching of satellite images of patterns in the global dataset
-	vegetation_patterns_fetch();
+	vegetation_patterns_fetch(meta);
 
 	% analying of patterns in the global dataset
 	vegetation_patterns_analyze_2d(meta);
